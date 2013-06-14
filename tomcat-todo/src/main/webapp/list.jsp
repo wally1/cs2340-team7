@@ -6,10 +6,13 @@
 
 <html>
 <head>
+
+
 <title>New Game Setup</title>
 </head>
 <body>
 <h1>Players</h1>
+<%! int numplayers =  3;%>
 
 
 <form action="">
@@ -19,13 +22,24 @@
 <option value="5">5</option>
 <option value="6">6</option>
 </select>
-<input type="Go!!">
+
+<% if(request.getParameter("Number of Players")!=null)
+{ 
+ numplayers = Integer.parseInt(request.getParameter("Number of Players")); 
+} 
+%>
+
+<input type="Submit" value = "Go!">
+
 </form>
+
+The number of players is: <%= numplayers %>
+
 
 
 <table>
 <tr>
-<th>Player</th><th>Color</th>
+<th>Player</th><th>Country</th>
 </tr>
 
 <% for (Integer id: todos.keySet()) { %>
@@ -35,7 +49,7 @@
   <!-- hidden operation element to simulate HTTP PUT method in server -->
   <input type="hidden" name="operation" value="PUT"/>
   <td><input type="text" name="title" value="<%= todo.getTitle() %>"/></td>
-  <td><input type="text" name="task" value="<%= todo.getTask() %>"/></td>
+
   <td><input type="submit" value="Update"/></td>
 </form>
 <td valign="bottom">
@@ -48,10 +62,27 @@
 </tr>
 <% } %>
 <tr>
-<form action="/todo/create" method="POST">
+
+<form action="/todo/update/" method="POST">
+
+<% String name = ""; %>
+
+<% for (int i=1; i<=numplayers; i++) { %>
+
   <td><input type="text" name="Player"/></td>
-  <td><input type="text" name="Color"/></td>
-  <td><input type="submit" value="Add"/></td>
+
+  <td><select name="Country">
+<option value="3">Dominaria</option>
+<option value="4">Kamigawa</option>
+<option value="5">Ravnica</option>
+<option value="6">Rath</option>
+<option value="7">Mirrodin</option>
+<option value="8">Innistrad</option>
+  <td><input type="submit" value="Update"/></td></form>
+</td><tr></tr>
+</select>
+<% } %>
+  <td><input type="submit" value="Confirm"/></td>
 </form>
 <td></td> <!-- empty cell to align with previous cells -->
 <br>
