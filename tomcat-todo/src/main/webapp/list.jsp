@@ -62,6 +62,10 @@ Player <%=id+1%> is from <%= todo.getTask() %> <br>
 <td></td> <!-- empty cell to align with previous cells -->
 </tr>
 </table>
+<form action = /todo/confirmation.jsp>
+
+<input type ="submit" value ="Finish!">
+</form>
 
 </body>
 </html>

@@ -39,7 +39,10 @@ public class TodoServlet extends HttpServlet {
         } else if (operation.equalsIgnoreCase("DELETE")) {
             System.out.println("Delegating to doDelete().");
             doDelete(request, response);
-        } else {
+        } else { //add
+        	
+        	if(todos.size() <6)
+        	{
             String title = request.getParameter("title");
             String task = request.getParameter("Country");
             todos.put(todos.size(), new Todo(title, task));
@@ -47,6 +50,15 @@ public class TodoServlet extends HttpServlet {
             RequestDispatcher dispatcher = 
                 getServletContext().getRequestDispatcher("/list.jsp");
             dispatcher.forward(request,response);
+        	}
+        	else
+        	{
+        		System.out.println("There are too many players!!!");
+        		request.setAttribute("todos", todos);
+        		   RequestDispatcher dispatcher = 
+        	                getServletContext().getRequestDispatcher("/list.jsp");
+        	            dispatcher.forward(request,response);
+        	}
         }
     }
 
@@ -68,8 +80,7 @@ public class TodoServlet extends HttpServlet {
                          HttpServletResponse response)
             throws IOException, ServletException     
          {
-    	if(todos.size() <= 6)
-    	{
+
         System.out.println("In doPut()");
         String title = (String) request.getParameter("title");
         String task = (String)  request.getParameter("Country");
@@ -87,11 +98,8 @@ public class TodoServlet extends HttpServlet {
             getServletContext().getRequestDispatcher("/list.jsp");
         dispatcher.forward(request,response);
     	}
-    	else
-    	{
-    		System.out.println("Pull over dat ass too fat!");
-    	}
-         }
+
+         
 
     protected void doDelete(HttpServletRequest request,
                             HttpServletResponse response)
