@@ -25,4 +25,9 @@ public class Todo {
     public String  getTask() {
         return task;
     }
+    public String toString() {
+    	
+    	return title +" from "+task;
+    }
+    
 }

@@ -41,7 +41,7 @@ public class TodoServlet extends HttpServlet {
             doDelete(request, response);
         } else {
             String title = request.getParameter("title");
-            String task = request.getParameter("task");
+            String task = request.getParameter("Country");
             todos.put(todos.size(), new Todo(title, task));
             request.setAttribute("todos", todos);
             RequestDispatcher dispatcher = 
@@ -66,17 +66,32 @@ public class TodoServlet extends HttpServlet {
 
     protected void doPut(HttpServletRequest request,
                          HttpServletResponse response)
-            throws IOException, ServletException {
+            throws IOException, ServletException     
+         {
+    	if(todos.size() <= 6)
+    	{
         System.out.println("In doPut()");
         String title = (String) request.getParameter("title");
-        String task = (String)  request.getParameter("task");
+        String task = (String)  request.getParameter("Country");
         int id = getId(request);
         todos.put(id, new Todo(title, task));
+        for(int a:todos.keySet())
+        {
+        	System.out.println(todos.get(a));
+        }
+        
+     
+        
         request.setAttribute("todos", todos);
         RequestDispatcher dispatcher = 
             getServletContext().getRequestDispatcher("/list.jsp");
         dispatcher.forward(request,response);
-    }
+    	}
+    	else
+    	{
+    		System.out.println("Pull over dat ass too fat!");
+    	}
+         }
 
     protected void doDelete(HttpServletRequest request,
                             HttpServletResponse response)

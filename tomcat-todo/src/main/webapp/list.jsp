@@ -1,46 +1,23 @@
 <%@ page import="edu.gatech.cs2340.todo.model.Todo" %>
 <%@ page import="java.util.*" %>
 
-<% TreeMap<Integer, Todo> todos = 
+<% TreeMap<Integer, Todo> todos =
    (TreeMap<Integer, Todo>) request.getAttribute("todos"); %>
 
 <html>
 <head>
-
-
 <title>New Game Setup</title>
+<link rel="stylesheet" type="text/css" href="stylesheets/main.css">
 </head>
 <body>
-<h1>Players</h1>
-<%! int numplayers =  3;%>
-
-
-<form action="">
-<select name="Number of Players">
-<option value="3">3</option>
-<option value="4">4</option>
-<option value="5">5</option>
-<option value="6">6</option>
-</select>
-
-<% if(request.getParameter("Number of Players")!=null)
-{ 
- numplayers = Integer.parseInt(request.getParameter("Number of Players")); 
-} 
-%>
-
-<input type="Submit" value = "Go!">
-
-</form>
-
-The number of players is: <%= numplayers %>
-
-
+<h1>Risk!</h1>
 
 <table>
 <tr>
 <th>Player</th><th>Country</th>
 </tr>
+
+The number of players is <%=todos.keySet().size() %><br>
 
 <% for (Integer id: todos.keySet()) { %>
 <% Todo todo = todos.get(id); %>
@@ -49,8 +26,17 @@ The number of players is: <%= numplayers %>
   <!-- hidden operation element to simulate HTTP PUT method in server -->
   <input type="hidden" name="operation" value="PUT"/>
   <td><input type="text" name="title" value="<%= todo.getTitle() %>"/></td>
-
+ <td><select name="Country">
+<option value="Dominaria">Dominaria</option>
+<option value="Kamigawa">Kamigawa</option>
+<option value="Ravnica">Ravnica</option>
+<option value="Rath">Rath</option>
+<option value="Mirrodin">Mirrodin</option>
+<option value="Innistrad">Innistrad</option></td>
   <td><input type="submit" value="Update"/></td>
+
+Player <%=id+1%>'s name is <%= todo.getTitle() %> <br>
+Player <%=id+1%> is from <%= todo.getTask() %> <br>
 </form>
 <td valign="bottom">
   <form action="/todo/delete/<%= id %>" method="POST">
@@ -62,31 +48,18 @@ The number of players is: <%= numplayers %>
 </tr>
 <% } %>
 <tr>
-
-<form action="/todo/update/" method="POST">
-
-<% String name = ""; %>
-
-<% for (int i=1; i<=numplayers; i++) { %>
-
-  <td><input type="text" name="Player"/></td>
-
-  <td><select name="Country">
-<option value="3">Dominaria</option>
-<option value="4">Kamigawa</option>
-<option value="5">Ravnica</option>
-<option value="6">Rath</option>
-<option value="7">Mirrodin</option>
-<option value="8">Innistrad</option>
-  <td><input type="submit" value="Update"/></td></form>
-</td><tr></tr>
-</select>
-<% } %>
-  <td><input type="submit" value="Confirm"/></td>
+<form action="/todo/update" method="POST">
+  <td><input type="text" name="title"/></td><td>
+ <select name="Country">
+<option value="Dominaria">Dominaria</option>
+<option value="Kamigawa">Kamigawa</option>
+<option value="Ravnica">Ravnica</option>
+<option value="Rath">Rath</option>
+<option value="Mirrodin">Mirrodin</option>
+<option value="Innistrad">Innistrad</option></td>
+  <td><input type="submit" value="Add"/></td>
 </form>
 <td></td> <!-- empty cell to align with previous cells -->
-<br>
-
 </tr>
 </table>
 
