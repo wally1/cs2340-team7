@@ -48,8 +48,12 @@ Player <%=id+1%> is from <%= todo.getTask() %> <br>
 </tr>
 <% } %>
 <tr>
+
 <form action="/todo/update" method="POST">
   <td><input type="text" name="title"/></td><td>
+<input type = "hidden" name = "operation" value="ADD" /></td>
+<td>
+
  <select name="Country">
 <option value="Dominaria">Dominaria</option>
 <option value="Kamigawa">Kamigawa</option>
@@ -59,13 +63,32 @@ Player <%=id+1%> is from <%= todo.getTask() %> <br>
 <option value="Innistrad">Innistrad</option></td>
   <td><input type="submit" value="Add"/></td>
 </form>
+
 <td></td> <!-- empty cell to align with previous cells -->
 </tr>
 </table>
-<form action = /todo/confirmation.jsp>
 
-<input type ="submit" value ="Finish!">
+<form action = "/todo/update" method = "POST">
+
+<%
+ArrayList<Integer> turns = new ArrayList<Integer>();
+for(int b = 1; b <= todos.size(); b++)
+{turns.add(b);}
+Collections.shuffle(turns);
+for(int c = 0; c < todos.size(); c++)
+{ todos.get(c).setTurn(turns.get(c));
+todos.get(c).setArmySize(turns.get(c)*5+15); }
+%>
+
+<%for(int id: todos.keySet()){
+ System.out.println(todos.get(id));
+} %>
+
+
+
+<input type ="submit"  value ="Finish!"/>
 </form>
+
 
 </body>
 </html>

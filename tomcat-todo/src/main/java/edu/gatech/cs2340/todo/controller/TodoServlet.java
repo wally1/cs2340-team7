@@ -15,7 +15,8 @@ import javax.servlet.http.HttpServletResponse;
         "/list", // GET
         "/create", // POST 
         "/update/*", // PUT
-        "/delete/*" // DELETE
+        "/delete/*", // DELETE
+        "/confirmation"
     })
 public class TodoServlet extends HttpServlet {
 
@@ -29,9 +30,11 @@ public class TodoServlet extends HttpServlet {
         // Handle the hidden HTML form field that simulates
         // HTTP PUT and DELETE methods.
         String operation = (String) request.getParameter("operation");
+        System.out.println(operation);
         // If form didn't contain an operation field and
         // we're in doPost(), the operation is POST
-        if (null == operation) operation = "POST";
+     
+        if (null == operation){operation = "CONFIRMATION";}
         System.out.println("operation is " + operation);
         if (operation.equalsIgnoreCase("PUT")) {
             System.out.println("Delegating to doPut().");
@@ -39,7 +42,13 @@ public class TodoServlet extends HttpServlet {
         } else if (operation.equalsIgnoreCase("DELETE")) {
             System.out.println("Delegating to doDelete().");
             doDelete(request, response);
-        } else { //add
+        } else if (operation.equalsIgnoreCase("CONFIRMATION")) {
+        	System.out.println("CONFIRMATION CONFIRMATION CONFIRMATION!");
+        	request.setAttribute("todos", todos);
+            RequestDispatcher dispatcher = 
+            getServletContext().getRequestDispatcher("/confirmation.jsp");
+            dispatcher.forward(request,response);
+        } else if (operation.equalsIgnoreCase("ADD")){ //add
         	
         	if(todos.size() <6)
         	{
@@ -47,14 +56,25 @@ public class TodoServlet extends HttpServlet {
             String task = request.getParameter("Country");
             todos.put(todos.size(), new Todo(title, task));
             request.setAttribute("todos", todos);
+//            if (todos.size() == 4)
+//            {
+//            	 RequestDispatcher dispatcher = 
+//                         getServletContext().getRequestDispatcher("/confirmation.jsp");
+//                     dispatcher.forward(request,response);
+//            }
+//            else
+//            {
             RequestDispatcher dispatcher = 
                 getServletContext().getRequestDispatcher("/list.jsp");
             dispatcher.forward(request,response);
+//            }
+        
+            
         	}
         	else
         	{
         		System.out.println("There are too many players!!!");
-        		request.setAttribute("todos", todos);
+        		
         		   RequestDispatcher dispatcher = 
         	                getServletContext().getRequestDispatcher("/list.jsp");
         	            dispatcher.forward(request,response);
