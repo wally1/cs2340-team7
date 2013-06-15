@@ -84,7 +84,7 @@ todos.get(c).setArmySize(turns.get(c)*5+15); }
  System.out.println(todos.get(id));
 } %>
 
-
+<td></td>
 
 <input type ="submit"  value ="Finish!"/>
 </form>
