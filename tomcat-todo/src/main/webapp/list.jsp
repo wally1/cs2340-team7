@@ -35,6 +35,10 @@ The number of players is <%=todos.keySet().size() %><br>
 <option value="Innistrad">Innistrad</option></td>
   <td><input type="submit" value="Update"/></td>
 
+<% <script type="text/javascript"> 
+setSelectedIndex(document.getElementById('Country'),todo.getTask()); 
+</script> %>
+
 Player <%=id+1%>'s name is <%= todo.getTitle() %> <br>
 Player <%=id+1%> is from <%= todo.getTask() %> <br>
 </form>
