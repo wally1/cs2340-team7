@@ -1,6 +1,7 @@
 package edu.gatech.cs2340.todo.controller;
 
 import edu.gatech.cs2340.todo.model.Todo;
+import java.util.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.TreeMap;
@@ -20,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
     })
 public class TodoServlet extends HttpServlet {
 
-    TreeMap<Integer, Todo> todos = new TreeMap<>();
+    ArrayList<Todo> todos = new ArrayList<Todo>();
 
     @Override
     protected void doPost(HttpServletRequest request,
@@ -39,42 +40,49 @@ public class TodoServlet extends HttpServlet {
         if (operation.equalsIgnoreCase("PUT")) {
             System.out.println("Delegating to doPut().");
             doPut(request, response);
-        } else if (operation.equalsIgnoreCase("DELETE")) {
+        } 
+        else if (operation.equalsIgnoreCase("NEW")){
+        	System.out.println("THIS IS A NEW GAME!");
+        	todos = new ArrayList<Todo>();
+        	//clears the players
+        }
+        else if (operation.equalsIgnoreCase("DELETE")) {
             System.out.println("Delegating to doDelete().");
             doDelete(request, response);
         } else if (operation.equalsIgnoreCase("CONFIRMATION")) {
+        	if(todos.size() > 2 && todos.size() < 7){
         	System.out.println("CONFIRMATION CONFIRMATION CONFIRMATION!");
         	request.setAttribute("todos", todos);
             RequestDispatcher dispatcher = 
             getServletContext().getRequestDispatcher("/confirmation.jsp");
             dispatcher.forward(request,response);
+        	}
+        	else
+        	{
+        		System.out.println("The number of players in the game isn't correct!");
+            	request.setAttribute("todos", todos);
+        		RequestDispatcher dispatcher = 
+                        getServletContext().getRequestDispatcher("/list.jsp");
+                        dispatcher.forward(request,response);
+        	}
         } else if (operation.equalsIgnoreCase("ADD")){ //add
         	
         	if(todos.size() <6)
         	{
             String title = request.getParameter("title");
-            String task = request.getParameter("Country");
-            todos.put(todos.size(), new Todo(title, task));
+            String task = request.getParameter("Country"); 
+            todos.add(new Todo(title, task));
             request.setAttribute("todos", todos);
-//            if (todos.size() == 4)
-//            {
-//            	 RequestDispatcher dispatcher = 
-//                         getServletContext().getRequestDispatcher("/confirmation.jsp");
-//                     dispatcher.forward(request,response);
-//            }
-//            else
-//            {
+
             RequestDispatcher dispatcher = 
                 getServletContext().getRequestDispatcher("/list.jsp");
             dispatcher.forward(request,response);
-//            }
-        
-            
+
         	}
         	else
         	{
         		System.out.println("There are too many players!!!");
-        		
+        		   request.setAttribute("todos", todos);
         		   RequestDispatcher dispatcher = 
         	                getServletContext().getRequestDispatcher("/list.jsp");
         	            dispatcher.forward(request,response);
@@ -82,6 +90,18 @@ public class TodoServlet extends HttpServlet {
         }
     }
 
+    //makes sure each player is representing a different country
+//    protected Boolean seperateCountries(TreepMap<Integer,todo> players)
+//    {
+//    	boolean go = false;
+//    	for(Integer key: players.keySet())
+//    	{
+//    		
+//    	}
+//    	
+//    }
+    
+    
     /**
      * Called when HTTP method is GET 
      * (e.g., from an <a href="...">...</a> link).
@@ -105,10 +125,10 @@ public class TodoServlet extends HttpServlet {
         String title = (String) request.getParameter("title");
         String task = (String)  request.getParameter("Country");
         int id = getId(request);
-        todos.put(id, new Todo(title, task));
-        for(int a:todos.keySet())
+        todos.set(id, new Todo(title, task));
+        for(Todo a:todos)
         {
-        	System.out.println(todos.get(a));
+        	System.out.println(a);
         }
         
      

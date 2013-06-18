@@ -1,8 +1,8 @@
 <%@ page import="edu.gatech.cs2340.todo.model.Todo" %>
 <%@ page import="java.util.*" %>
 
-<% TreeMap<Integer, Todo> todos =
-   (TreeMap<Integer, Todo>) request.getAttribute("todos"); %>
+<% ArrayList<Todo> todos =
+   (ArrayList<Todo>) request.getAttribute("todos"); %>
 
 <html>
 <head>
@@ -17,9 +17,9 @@
 <th>Player</th><th>Country</th>
 </tr>
 
-The number of players is <%=todos.keySet().size() %><br>
+The number of players is <%=todos.size() %><br>
 
-<% for (Integer id: todos.keySet()) { %>
+<% for (int id =0;id<todos.size();id++) { %>
 <% Todo todo = todos.get(id); %>
 <tr>
 <form action="/todo/update/<%= id %>" method="POST">
@@ -35,9 +35,6 @@ The number of players is <%=todos.keySet().size() %><br>
 <option value="Innistrad">Innistrad</option></td>
   <td><input type="submit" value="Update"/></td>
 
-<% <script type="text/javascript"> 
-setSelectedIndex(document.getElementById('Country'),todo.getTask()); 
-</script> %>
 
 Player <%=id+1%>'s name is <%= todo.getTitle() %> <br>
 Player <%=id+1%> is from <%= todo.getTask() %> <br>
@@ -56,9 +53,7 @@ Player <%=id+1%> is from <%= todo.getTask() %> <br>
 <form action="/todo/update" method="POST">
   <td><input type="text" name="title"/></td><td>
 <input type = "hidden" name = "operation" value="ADD" /></td>
-<td>
-
- <select name="Country">
+<td> <select name="Country">
 <option value="Dominaria">Dominaria</option>
 <option value="Kamigawa">Kamigawa</option>
 <option value="Ravnica">Ravnica</option>
@@ -81,11 +76,11 @@ for(int b = 1; b <= todos.size(); b++)
 Collections.shuffle(turns);
 for(int c = 0; c < todos.size(); c++)
 { todos.get(c).setTurn(turns.get(c));
-todos.get(c).setArmySize(turns.get(c)*5+15); }
+todos.get(c).setArmySize(35-((todos.size()-3)*5)); }
 %>
 
-<%for(int id: todos.keySet()){
- System.out.println(todos.get(id));
+<%for(Todo id: todos){
+ System.out.println(id);
 } %>
 
 <td></td>
