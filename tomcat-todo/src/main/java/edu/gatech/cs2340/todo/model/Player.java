@@ -1,12 +1,16 @@
 package edu.gatech.cs2340.todo.model;
 
-public class Player {
+import java.util.*;
+
+public class Player 
+{
     
     String name;
     String country;
     int turn;
-    int armysize; //temporary - in future army will consist of different type of units -> treemap
-//    ArrayList<Territory>;
+    int armysize; //temporary - in future army will consist of different type of units -> treemap of Units
+    ArrayList<Territory> occupiedTerritories; //A list of all territories occupied by this player
+//	ArrayList<Resource> ownedResources; //A List of all resources owned by the player
     
 
     public Player(String title, String task) { //constructors may be temporary, may later intialize with x army, y turn, etc. 
@@ -14,14 +18,14 @@ public class Player {
         country = task;
         turn = 0;  
         armysize = 0;
- //       ArrayList<Territory> = new ArrayList<Territory>();
+        occupiedTerritories= new ArrayList<Territory>();
     }
 
     public void setName(String title) {
         name = title;
     }
 
-    public String  getName() {
+    public String getName() {
         return name;
     }
 

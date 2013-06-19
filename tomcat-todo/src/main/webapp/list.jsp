@@ -1,8 +1,8 @@
-<%@ page import="edu.gatech.cs2340.todo.model.Todo" %>
+<%@ page import="edu.gatech.cs2340.todo.model.Player" %>
 <%@ page import="java.util.*" %>
 
-<% ArrayList<Todo> todos =
-   (ArrayList<Todo>) request.getAttribute("todos"); %>
+<% ArrayList<Player> players =
+   (ArrayList<Player>) request.getAttribute("players"); %>
 
 <html>
 <head>
@@ -17,15 +17,15 @@
 <th>Player</th><th>Country</th>
 </tr>
 
-The number of players is <%=todos.size() %><br>
+The number of players is <%=players.size() %><br>
 
-<% for (int id =0;id<todos.size();id++) { %>
-<% Todo todo = todos.get(id); %>
+<% for (int id =0;id<players.size();id++) { %>
+<% Player player = players.get(id); %>
 <tr>
 <form action="/todo/update/<%= id %>" method="POST">
   <!-- hidden operation element to simulate HTTP PUT method in server -->
   <input type="hidden" name="operation" value="PUT"/>
-  <td><input type="text" name="title" value="<%= todo.getTitle() %>"/></td>
+  <td><input type="text" name="Name" value="<%= player.getName() %>"/></td>
  <td><select name="Country">
 <option value="Dominaria">Dominaria</option>
 <option value="Kamigawa">Kamigawa</option>
@@ -36,8 +36,8 @@ The number of players is <%=todos.size() %><br>
   <td><input type="submit" value="Update"/></td>
 
 
-Player <%=id+1%>'s name is <%= todo.getTitle() %> <br>
-Player <%=id+1%> is from <%= todo.getTask() %> <br>
+Player <%=id+1%>'s name is <%= player.getName() %> <br>
+Player <%=id+1%> is from <%= player.getCountry() %> <br>
 </form>
 <td valign="bottom">
   <form action="/todo/delete/<%= id %>" method="POST">
@@ -51,7 +51,7 @@ Player <%=id+1%> is from <%= todo.getTask() %> <br>
 <tr>
 
 <form action="/todo/update" method="POST">
-  <td><input type="text" name="title"/></td><td>
+  <td><input type="text" name="Name"/></td><td>
 <input type = "hidden" name = "operation" value="ADD" /></td>
 <td> <select name="Country">
 <option value="Dominaria">Dominaria</option>
@@ -71,17 +71,15 @@ Player <%=id+1%> is from <%= todo.getTask() %> <br>
 
 <%
 ArrayList<Integer> turns = new ArrayList<Integer>();
-for(int b = 1; b <= todos.size(); b++)
+for(int b = 1; b <= players.size(); b++)
 {turns.add(b);}
 Collections.shuffle(turns);
-for(int c = 0; c < todos.size(); c++)
-{ todos.get(c).setTurn(turns.get(c));
-todos.get(c).setArmySize(35-((todos.size()-3)*5)); }
+for(int c = 0; c < players.size(); c++)
+{ players.get(c).setTurn(turns.get(c));
+players.get(c).setArmySize(35-((players.size()-3)*5)); }
 %>
 
-<%for(Todo id: todos){
- System.out.println(id);
-} %>
+
 
 <td></td>
 

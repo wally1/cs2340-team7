@@ -1,6 +1,7 @@
 package edu.gatech.cs2340.todo.controller;
 
-import edu.gatech.cs2340.todo.model.Todo;
+
+import edu.gatech.cs2340.todo.model.Player;
 import java.util.*;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
     })
 public class TodoServlet extends HttpServlet {
 
-    ArrayList<Todo> todos = new ArrayList<Todo>();
+    ArrayList<Player> players = new ArrayList<Player>();
 
     @Override
     protected void doPost(HttpServletRequest request,
@@ -35,24 +36,22 @@ public class TodoServlet extends HttpServlet {
         // If form didn't contain an operation field and
         // we're in doPost(), the operation is POST
      
+        //probably more elegant fix later, like just changing operation to "Confirmation"
         if (null == operation){operation = "CONFIRMATION";}
-        System.out.println("operation is " + operation);
+    
+        
         if (operation.equalsIgnoreCase("PUT")) {
             System.out.println("Delegating to doPut().");
             doPut(request, response);
         } 
-        else if (operation.equalsIgnoreCase("NEW")){
-        	System.out.println("THIS IS A NEW GAME!");
-        	todos = new ArrayList<Todo>();
-        	//clears the players
-        }
         else if (operation.equalsIgnoreCase("DELETE")) {
             System.out.println("Delegating to doDelete().");
             doDelete(request, response);
+            
         } else if (operation.equalsIgnoreCase("CONFIRMATION")) {
-        	if(todos.size() > 2 && todos.size() < 7){
+        	if(players.size() > 2 && players.size() < 7 && seperateCountries(players)){
         	System.out.println("CONFIRMATION CONFIRMATION CONFIRMATION!");
-        	request.setAttribute("todos", todos);
+        	request.setAttribute("players", players);
             RequestDispatcher dispatcher = 
             getServletContext().getRequestDispatcher("/confirmation.jsp");
             dispatcher.forward(request,response);
@@ -60,19 +59,20 @@ public class TodoServlet extends HttpServlet {
         	else
         	{
         		System.out.println("The number of players in the game isn't correct!");
-            	request.setAttribute("todos", todos);
+            	request.setAttribute("players", players);
         		RequestDispatcher dispatcher = 
                         getServletContext().getRequestDispatcher("/list.jsp");
                         dispatcher.forward(request,response);
         	}
         } else if (operation.equalsIgnoreCase("ADD")){ //add
         	
-        	if(todos.size() <6)
+        	if(players.size() <6)
         	{
-            String title = request.getParameter("title");
-            String task = request.getParameter("Country"); 
-            todos.add(new Todo(title, task));
-            request.setAttribute("todos", todos);
+        		System.out.println("We're adding a player!");
+            String name = request.getParameter("Name");
+            String country = request.getParameter("Country"); 
+            players.add(new Player(name,country));
+            request.setAttribute("players", players);
 
             RequestDispatcher dispatcher = 
                 getServletContext().getRequestDispatcher("/list.jsp");
@@ -82,7 +82,7 @@ public class TodoServlet extends HttpServlet {
         	else
         	{
         		System.out.println("There are too many players!!!");
-        		   request.setAttribute("todos", todos);
+        		   request.setAttribute("players", players);
         		   RequestDispatcher dispatcher = 
         	                getServletContext().getRequestDispatcher("/list.jsp");
         	            dispatcher.forward(request,response);
@@ -91,15 +91,28 @@ public class TodoServlet extends HttpServlet {
     }
 
     //makes sure each player is representing a different country
-//    protected Boolean seperateCountries(TreepMap<Integer,todo> players)
-//    {
-//    	boolean go = false;
-//    	for(Integer key: players.keySet())
-//    	{
-//    		
-//    	}
-//    	
-//    }
+    protected Boolean seperateCountries(ArrayList<Player> players)
+    {
+    	System.out.println("The size of the array "+players.size());
+    	boolean go = true;
+    	//0-1 size =3
+    	for(int a = 0; a<players.size()-1;a++)
+    	{ //1-2
+    		for(int b = a+1; b<players.size();b++)
+    		{
+    			System.out.println(a+" "+b);
+    			if(players.get(a).getCountry().equals(players.get(b).getCountry()))
+    			{	
+    				System.out.println("Brothers can't fight brothers!");
+    				go = false;
+    				break;
+    			}
+    		}
+    		
+    	}
+    	return go;
+    	
+    }
     
     
     /**
@@ -110,7 +123,10 @@ public class TodoServlet extends HttpServlet {
                          HttpServletResponse response)
             throws IOException, ServletException {
         System.out.println("In doGet()");
-        request.setAttribute("todos", todos);
+//        players = new ArrayList<Player>();
+   //     System.out.println("Starting a new game, erasing the player ArrayList");
+
+        request.setAttribute("players", players);
         RequestDispatcher dispatcher = 
             getServletContext().getRequestDispatcher("/list.jsp");
         dispatcher.forward(request,response);
@@ -122,18 +138,18 @@ public class TodoServlet extends HttpServlet {
          {
 
         System.out.println("In doPut()");
-        String title = (String) request.getParameter("title");
+        String title = (String) request.getParameter("Name");
         String task = (String)  request.getParameter("Country");
         int id = getId(request);
-        todos.set(id, new Todo(title, task));
-        for(Todo a:todos)
+        players.set(id, new Player(title, task)); 
+        for(Player a:players)
         {
         	System.out.println(a);
         }
         
      
         
-        request.setAttribute("todos", todos);
+        request.setAttribute("players", players);
         RequestDispatcher dispatcher = 
             getServletContext().getRequestDispatcher("/list.jsp");
         dispatcher.forward(request,response);
@@ -146,8 +162,8 @@ public class TodoServlet extends HttpServlet {
             throws IOException, ServletException {
         System.out.println("In doDelete()");
         int id = getId(request);
-        todos.remove(id);
-        request.setAttribute("todos", todos);
+        players.remove(id);
+        request.setAttribute("players", players);
         RequestDispatcher dispatcher = 
             getServletContext().getRequestDispatcher("/list.jsp");
         dispatcher.forward(request,response);
