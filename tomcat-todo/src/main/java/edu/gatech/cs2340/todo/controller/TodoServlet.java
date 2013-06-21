@@ -2,6 +2,7 @@ package edu.gatech.cs2340.todo.controller;
 
 
 import edu.gatech.cs2340.todo.model.Player;
+import edu.gatech.cs2340.todo.model.RiskGame;
 import java.util.*;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -29,6 +30,7 @@ public class TodoServlet extends HttpServlet {
                           HttpServletResponse response)
             throws IOException, ServletException {
         System.out.println("In doPost()");
+        RiskGame game = new RiskGame(0);
         // Handle the hidden HTML form field that simulates
         // HTTP PUT and DELETE methods.
         String operation = (String) request.getParameter("operation");
