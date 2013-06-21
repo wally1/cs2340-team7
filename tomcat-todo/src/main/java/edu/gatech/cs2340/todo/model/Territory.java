@@ -13,10 +13,8 @@ public class Territory{
 	boolean isOccupied; //true if there is a unit occupying the territory -> presence enough to occupy or need to spend turns capping?
 	ArrayList<Unit> occupiedByUnit; //the unit occupying this territory
 	Player occupiedByPlayer; //the player who occupies this territory 
-	
 	boolean occupiable;
 	boolean homeBase;
-	   
 
 public Territory(String name, int[] coords, String reg){
 	
@@ -43,6 +41,7 @@ public Territory(String name, int[] coords, String reg){
 	{
 		return homeBase;
 	}
+
 	public void addResource(Resource treasure)
 	{
 		resources.add(treasure);
