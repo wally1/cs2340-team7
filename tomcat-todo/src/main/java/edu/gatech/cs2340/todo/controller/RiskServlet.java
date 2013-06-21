@@ -1,3 +1,5 @@
+// new sample servlet
+/*
 package edu.gatech.cs2340.todo.controller;
 
 
@@ -21,16 +23,16 @@ import javax.servlet.http.HttpServletResponse;
         "/delete/*", // DELETE
         "/confirmation"
     })
-public class TodoServlet extends HttpServlet {
+public class RiskServlet extends HttpServlet {
 
-    ArrayList<Player> players = new ArrayList<Player>();
-
+    //ArrayList<Player> players = new ArrayList<Player>();
+    ArrayList<RiskGame> games = new ArrayList<RiskGame>(); // left off after adding this!
+    
     @Override
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response)
             throws IOException, ServletException {
         System.out.println("In doPost()");
-        RiskGame game = new RiskGame(0);
         // Handle the hidden HTML form field that simulates
         // HTTP PUT and DELETE methods.
         String operation = (String) request.getParameter("operation");
@@ -42,7 +44,7 @@ public class TodoServlet extends HttpServlet {
         if (null == operation){operation = "CONFIRMATION";}
     
         
-        if (operation.equalsIgnoreCase("PUT")) {
+        if (operation.equalsIgnoreCase("PUT")) { // ??? WTF
             System.out.println("Delegating to doPut().");
             doPut(request, response);
         } 
@@ -121,6 +123,7 @@ public class TodoServlet extends HttpServlet {
      * Called when HTTP method is GET 
      * (e.g., from an <a href="...">...</a> link).
      */
+     /*
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response)
             throws IOException, ServletException {
@@ -178,4 +181,4 @@ public class TodoServlet extends HttpServlet {
         return Integer.parseInt(idStr);
     }
 
-}
+}*/
