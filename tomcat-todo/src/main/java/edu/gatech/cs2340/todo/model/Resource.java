@@ -1,3 +1,7 @@
+//intent of the Resource class is to implement an extra layer of depth to the game via "Resources" each player can acquire
+//to boost army strength/size. it may or may not be implemented in the final game
+//as of now it serves to set up impassable "Asteroid" terrain.
+
 package edu.gatech.cs2340.todo.model;
 
 import edu.gatech.cs2340.todo.model.Territory;
@@ -8,14 +12,14 @@ public class Resource
 	String name;
 	Unit ownedBy;
 	Player inPossession;
-	Territory spawnLocation;
+	Territory location;
 	
 	public Resource(String name, Territory spawn)
 	{
 		this.name = name;
 		ownedBy = null;
 		inPossession = null;
-		spawnLocation = spawn;
+		location = spawn;
 	}
 	public void pickedUpBy(Unit unit, Player player)
 	{
@@ -25,5 +29,9 @@ public class Resource
 	public String getName()
 	{
 		return name;
+	}
+	public void setTerritory(Territory location)
+	{
+		this.location = location;
 	}
 }

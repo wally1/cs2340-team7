@@ -27,12 +27,12 @@ The number of players is <%=players.size() %><br>
   <input type="hidden" name="operation" value="PUT"/>
   <td><input type="text" name="Name" value="<%= player.getName() %>"/></td>
  <td><select name="Country">
-<option value="Dominaria">Dominaria</option>
-<option value="Kamigawa">Kamigawa</option>
-<option value="Ravnica">Ravnica</option>
-<option value="Rath">Rath</option>
-<option value="Mirrodin">Mirrodin</option>
-<option value="Innistrad">Innistrad</option></td>
+<option value="Polaris">Polaris</option>
+<option value="Alpha-Centauri">Alpha-Centauri</option>
+<option value="Char">Char</option>
+<option value="Midichloria">Midichloria</option>
+<option value="Borg">Borg</option>
+<option value="HAL Space Station">HAL Space Station</option></td>
   <td><input type="submit" value="Update"/></td>
 
 
@@ -54,12 +54,12 @@ Player <%=id+1%> is from <%= player.getCountry() %> <br>
   <td><input type="text" name="Name"/></td><td>
 <input type = "hidden" name = "operation" value="ADD" /></td>
 <td> <select name="Country">
-<option value="Dominaria">Dominaria</option>
-<option value="Kamigawa">Kamigawa</option>
-<option value="Ravnica">Ravnica</option>
-<option value="Rath">Rath</option>
-<option value="Mirrodin">Mirrodin</option>
-<option value="Innistrad">Innistrad</option></td>
+<option value="Polaris">Polaris</option>
+<option value="Alpha-Centauri">Alpha-Centauri</option>
+<option value="Char">Char</option>
+<option value="Midichloria">Midichloria</option>
+<option value="Borg">Borg</option>
+<option value="HAL Space Station">HAL Space Station</option></td>
   <td><input type="submit" value="Add"/></td>
 </form>
 

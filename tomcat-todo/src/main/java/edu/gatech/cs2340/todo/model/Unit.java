@@ -25,6 +25,22 @@ public class Unit
 	{
 		return name;
 	}
+	public void setOwner(Player player)
+	{
+		owner = player;
+	}
+	public Player getOwner()
+	{
+		return owner;
+	}
+	public void attack(Unit enemy)
+	{
+		//this unit attacks the parameter unit, will probably involve a "dice roll" (RNG 1-6) multiplied by the attacker's attack minus 
+		//the defender's defense multiplied by a dice roll. More or less die rolls may depends on the specific attack/defense modifier
+		//the result will be subtracted from the defender's hp
+		
+		//if the defender is still alive, he will counterattack(?).
+	}
 	
 	
 	
