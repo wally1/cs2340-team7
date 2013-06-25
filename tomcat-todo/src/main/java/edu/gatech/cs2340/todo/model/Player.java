@@ -58,6 +58,11 @@ public class Player implements Comparable<Player>
     public int getArmySize() {
     	return armysize;
     }
+	 
+	 public void addArmy(int n){
+	 	armysize = armysize = n;
+	}
+	 
     public String toString() {	
     	return name +" from "+country+" has an army with " +armysize+" units in it and goes on turn "+turn+"\n\n";
     }

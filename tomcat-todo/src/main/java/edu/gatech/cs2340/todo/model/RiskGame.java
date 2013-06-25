@@ -1,7 +1,7 @@
 // RiskGame
 package edu.gatech.cs2340.todo.model;
 
-import edu.gatech.cs2340.todo.model.Player;
+import edu.gatech.cs2340.todo.model.*;
 import java.util.*;
 
 
@@ -35,6 +35,28 @@ public class RiskGame {
         return players;
     }
     
+	 public void addArmies() {
+	 		for(int i = 0; i < players.size(); i++){
+				if (players.get(i).getCountry().contains("HAL Space Station")){
+					players.get(i).addArmy(5);
+				}
+				if (players.get(i).getCountry().contains("Alpha-Centauri")){
+					players.get(i).addArmy(4);
+				}
+				if (players.get(i).getCountry().contains("Polaris")){
+					players.get(i).addArmy(5);
+				}
+				if (players.get(i).getCountry().contains("Midichloria")){
+					players.get(i).addArmy(3);
+				}
+				if (players.get(i).getCountry().contains("Borg")){
+					players.get(i).addArmy(3);
+				}
+				if (players.get(i).getCountry().contains("Char")){
+					players.get(i).addArmy(4);
+				}
+			}
+		}
     /**
       * add players state functions
       *
