@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
     })
 public class RiskServlet extends HttpServlet {
 
-    //ArrayList<Player> players = new ArrayList<Player>();
+    ArrayList<Player> players = new ArrayList<Player>();
     ArrayList<RiskGame> games = new ArrayList<RiskGame>(); // left off after adding this!
     
     @Override
@@ -122,8 +122,8 @@ public class RiskServlet extends HttpServlet {
     /**
      * Called when HTTP method is GET 
      * (e.g., from an <a href="...">...</a> link).
-     */
-     /*
+     *//*
+     
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response)
             throws IOException, ServletException {
@@ -181,4 +181,5 @@ public class RiskServlet extends HttpServlet {
         return Integer.parseInt(idStr);
     }
 
-}*/
+}
+*/

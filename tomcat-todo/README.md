@@ -1,5 +1,12 @@
 Changelog
 ============================
+6/28/2013
+-Changed several ArrayList variables to TreeMaps for unique identification (Player.army, Player.occupiedTerritories, Territorry.occupiedByUnit). 
+-Updated confirmation.jsp and respective classes to update change to TreeMap
+-Implmented update() methods for Player and Territory, the purpose of which is to update the current state of occupiedTerritories and occupiedByUnit to reflect unit movement. Still buggy.
+-M3 not yet fully implemented.
+
+
 6/21/2013
 -Confirmation.jsp now displays the Map, along with Home Territories, Asteroids and 	Units in ascii form
 -Made several changes to Player, Unit and Territory classes

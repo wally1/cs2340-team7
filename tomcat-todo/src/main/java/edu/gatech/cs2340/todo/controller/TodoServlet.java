@@ -30,7 +30,7 @@ public class TodoServlet extends HttpServlet {
                           HttpServletResponse response)
             throws IOException, ServletException {
         System.out.println("In doPost()");
-        RiskGame game = new RiskGame(0);
+   
         // Handle the hidden HTML form field that simulates
         // HTTP PUT and DELETE methods.
         String operation = (String) request.getParameter("operation");
@@ -75,7 +75,6 @@ public class TodoServlet extends HttpServlet {
             String country = request.getParameter("Country"); 
             players.add(new Player(name,country));
             request.setAttribute("players", players);
-
             RequestDispatcher dispatcher = 
                 getServletContext().getRequestDispatcher("/list.jsp");
             dispatcher.forward(request,response);

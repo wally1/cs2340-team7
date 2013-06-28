@@ -23,7 +23,6 @@ The number of players is <%=players.size() %><br>
 <% Player player = players.get(id); %>
 <tr>
 <form action="/todo/update/<%= id %>" method="POST">
-  <!-- hidden operation element to simulate HTTP PUT method in server -->
   <input type="hidden" name="operation" value="PUT"/>
   <td><input type="text" name="Name" value="<%= player.getName() %>"/></td>
  <td><select name="Country">
@@ -35,11 +34,10 @@ The number of players is <%=players.size() %><br>
 <option value="HAL Space Station">HAL Space Station</option></td>
   <td><input type="submit" value="Update"/></td>
 
-
 Player <%=id+1%>'s name is <%= player.getName() %> <br>
 Player <%=id+1%> is from <%= player.getCountry() %> <br>
 </form>
-<td valign="bottom">
+<td valign="middle">
   <form action="/todo/delete/<%= id %>" method="POST">
   <!-- hidden operation element to simulate HTTP DELETE method in server -->
     <input type="hidden" name="operation" value="DELETE"/>
@@ -51,8 +49,8 @@ Player <%=id+1%> is from <%= player.getCountry() %> <br>
 <tr>
 
 <form action="/todo/update" method="POST">
-  <td><input type="text" name="Name"/></td><td>
-<input type = "hidden" name = "operation" value="ADD" /></td>
+ <td> <input type="text" name="Name"/></td>
+<input type = "hidden" name = "operation" value="ADD" />
 <td> <select name="Country">
 <option value="Polaris">Polaris</option>
 <option value="Alpha-Centauri">Alpha-Centauri</option>
@@ -63,7 +61,7 @@ Player <%=id+1%> is from <%= player.getCountry() %> <br>
   <td><input type="submit" value="Add"/></td>
 </form>
 
-<td></td> <!-- empty cell to align with previous cells -->
+
 </tr>
 </table>
 
@@ -76,7 +74,7 @@ for(int b = 1; b <= players.size(); b++)
 Collections.shuffle(turns);
 for(int c = 0; c < players.size(); c++)
 { players.get(c).setTurn(turns.get(c));
-players.get(c).setArmySize(35-((players.size()-3)*5)); }
+ }
 %>
 
 

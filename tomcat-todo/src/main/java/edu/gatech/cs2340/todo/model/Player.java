@@ -7,19 +7,21 @@ public class Player implements Comparable<Player>
     
     String name;
     String country;
+    String color;
     int turn;
-    int armysize; //temporary - in future army will consist of different type of units -> treemap of Units
-    ArrayList<Territory> occupiedTerritories; //A list of all territories occupied by this player
+    TreeMap<Territory,Integer> occupiedTerritories; //A map of all territories occupied by this player, since multiple units can occupy the same territory
+    												//the territory will be the key, the number of units will be the stored value
 //	ArrayList<Resource> ownedResources; //A List of all resources owned by the player
-    ArrayList<Unit> army;
+    TreeMap<Integer,Unit> army; //key is Unit ID, value is the actual Unit
+    boolean hasLost;
 
     public Player(String title, String task) { //constructors may be temporary, may later intialize with x army, y turn, etc. 
         name = title;
         country = task;
         turn = 0;  
-        armysize = 0;
-        army = new ArrayList<Unit>();
-        occupiedTerritories= new ArrayList<Territory>();
+        army = new TreeMap<Integer,Unit>();
+        occupiedTerritories= new TreeMap<Territory,Integer>();
+        hasLost = false;
     }
     public int compareTo(Player other){
     	if(turn < other.getTurn())
@@ -50,21 +52,91 @@ public class Player implements Comparable<Player>
     public int getTurn(){
     	return turn;
     }
-    public void setArmySize(int size){
-    	armysize = size;
-    	for(int a = 0; a<size;a++)
-    		army.add(new Unit("Frigate",6,3,1,this));
+    public void addUnit(Unit unit) 
+    {	
+    	army.put(unit.getID(),unit);	
+    	update(unit.getID());
     }
-    public int getArmySize() {
-    	return armysize;
+    public TreeMap<Integer,Unit> getArmy()
+    {
+    	return army;
     }
-	 
-	 public void addArmy(int n){
-	 	armysize = armysize = n;
-	}
-	 
+    public int getArmySize() 
+    {
+    	return army.size();
+    }
+    public TreeMap<Territory,Integer> getOccupiedTerritories()
+    {
+    	return occupiedTerritories;
+    }
+    
+    //cleans up army and occupiedTerritories (gets rid of destroyed units and shifts occupiedTerritories as units move
+    public void update()
+    {
+    	//probably a more elegant way to do this with iterator
+    	ArrayList<Integer> toBeRemoved = new ArrayList<Integer>();
+    	for(int id: army.keySet())
+    	{
+    		if(army.get(id).getHealth() <= 0)
+    		{
+    			int currentUnitAmount = occupiedTerritories.get(army.get(id).getTerritory());
+    	    	occupiedTerritories.put(army.get(id).getTerritory(),currentUnitAmount-1);
+    	    	toBeRemoved.add(id);
+    		}
+    	}
+    	for(int id: toBeRemoved)
+    	{
+    		army.remove(id);
+    	}
+    }
+    public void update(int id)
+    {
+    	//updates occupiedTerritories, adds Territories that owned units currently occupy to the Treemap, 
+    	//then removes no longer occupied territories.
+      	//if unit stays in one place, MUST call unit.setTerritory to itself (in Unit)
+   /* 		Unit unit = army.get(id);
+      		Territory prev = unit.getPreviouslyOccupied();
+    		Territory territory = unit.getTerritory();
+    		if(occupiedTerritories.keySet().contains(territory))
+    		{
+    			int currentUnitAmount = occupiedTerritories.get(territory);
+    			occupiedTerritories.put(territory,currentUnitAmount+1);
+    		}
+    		else
+    			occupiedTerritories.put(territory,1);
+    		
+   		if(occupiedTerritories.keySet().contains(prev))
+    		{
+  			int currentUnitAmount = occupiedTerritories.get(prev);
+    			occupiedTerritories.put(prev,currentUnitAmount-1);
+    		}
+    	
+      	
+    	//probably a more elegant way to do this with iterator
+     	ArrayList<Territory> toBeRemovedT = new ArrayList<Territory>();
+     
+     	for(Territory a:occupiedTerritories.keySet())
+      	{
+     	
+      		if(occupiedTerritories.get(a) <= 0) //shouldn't ever be less than 0
+      		{
+      			System.out.println(occupiedTerritories.get(a));
+      			toBeRemovedT.add(a);
+      		}
+     	}
+      	for(Territory a: toBeRemovedT)
+      	{
+     		occupiedTerritories.remove(a);
+     	}*/
+    }
+    public void loses()
+    {
+    	hasLost = true;
+    	army = new TreeMap<Integer,Unit>();
+    	occupiedTerritories = new TreeMap<Territory,Integer>();
+    }
     public String toString() {	
-    	return name +" from "+country+" has an army with " +armysize+" units in it and goes on turn "+turn+"\n\n";
+    	return name +" from "+country+" has an army with " +army.size()+" units in it and goes on turn "+turn+"\n\n";
     }
     
 }

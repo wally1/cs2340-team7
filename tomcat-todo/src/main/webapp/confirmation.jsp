@@ -5,41 +5,35 @@
 <%@ page import="java.util.*" %>
 
 
-<% ArrayList<Player> players = (ArrayList<Player>)request.getAttribute("players"); 
-Collections.sort(players);
- ArrayList<String> countries = new ArrayList<String>(); 
+<% //some initializations
+int id = 1000;
+ArrayList<Player> players = (ArrayList<Player>)request.getAttribute("players"); 
 Unit ACUnit = new Unit("Alpha-Centaurian Space Frigate",5,3,1,null);
 Unit PolarisUnit = new Unit("Polarian Manta",4,5,2,null);
 Unit CharUnit = new Unit("Char Swarmling",3,2,0,null);
 Unit BorgUnit = new Unit("Borg Assimilator",8,2,2,null);
 Unit HALUnit = new Unit("HSS Probe",5,3,1,null);
-Unit MidiUnit = new Unit("Midichlorian Force",6,4,2,null);
-int armysize = players.get(0).getArmySize()/5;
+Unit MidiUnit = new Unit("Midichlorian Force",6,4,1,null);
+int armysize = (10-players.size()); 
+Collections.sort(players);
+ ArrayList<String> countries = new ArrayList<String>(); 
+for (Player player: players) { 
+
+	 countries.add(player.getCountry()); 
+	 if(player.getCountry().equals("Alpha-Centauri")){ACUnit.setOwner(player);}
+	 else if(player.getCountry().equals("Polaris")){PolarisUnit.setOwner(player);}
+	 else if(player.getCountry().equals("Char")){CharUnit.setOwner(player);}
+	 else if(player.getCountry().equals("Borg")){BorgUnit.setOwner(player);}
+	 else if(player.getCountry().equals("HAL Space Station")){HALUnit.setOwner(player);}
+	 else if(player.getCountry().equals("Midichloria")){MidiUnit.setOwner(player);}
+}
+
 %>
-
-
-
 <html>
 <head>
 <title>Pregame!</title>
 
-<% for (Player id: players) { 
-countries.add(id.getCountry()); 
-if(id.getCountry().equals("Alpha-Centauri")){ACUnit.setOwner(id);}
-else if(id.getCountry().equals("Polaris")){PolarisUnit.setOwner(id);}
-else if(id.getCountry().equals("Char")){CharUnit.setOwner(id);}
-else if(id.getCountry().equals("Borg")){BorgUnit.setOwner(id);}
-else if(id.getCountry().equals("HAL Space Station")){HALUnit.setOwner(id);}
-else if(id.getCountry().equals("Midichloria")){MidiUnit.setOwner(id);} %>
-<span style ="color:<%= colorCode(id) %>"> <%= id %></span><br>
-<% } %>
-<br>
-Let's make a map! <br><br>
-The "O"s represent each player's home base!<br>
-The "X"s represent impassable asteroids!<br>
-The "#"s in each territory represent the number of Units in each territory!<br>
-<br>
-<br>
+
 
 <%//instantiating the map 
 Territory[][] map = new Territory[9][15];
@@ -63,42 +57,56 @@ Territory[][] map = new Territory[9][15];
  if(countries.contains("Alpha-Centauri")){
  map[0][1].makeHomeBase(players.get(countries.indexOf("Alpha-Centauri"))); 
  int[] coords ={0,0,1,0,1,1,1,2,0,2};
- spawn(map, ACUnit,armysize,players.get(countries.indexOf("Alpha-Centauri")),coords);
+ id = spawn(map, ACUnit,armysize,coords,id); 
  }
  
  //upper middle is Polaris
  if(countries.contains("Polaris")){
 	map[0][7].makeHomeBase(players.get(countries.indexOf("Polaris"))); 
 	int[] coords = {0,6,1,6,1,7,1,8,0,8};
- 	spawn(map, PolarisUnit,armysize,players.get(countries.indexOf("Polaris")),coords); 
+ 	spawn(map, PolarisUnit,armysize,coords,id);  id+=coords.length/2*armysize;
  }
  //upper right is Midichloria
  if(countries.contains("Midichloria")){
 	map[0][13].makeHomeBase(players.get(countries.indexOf("Midichloria")));
 	int[] coords = {0,12,1,12,1,13,1,14,0,14};
-	spawn(map, MidiUnit,armysize,players.get(countries.indexOf("Midichloria")),coords);
+	id=spawn(map, MidiUnit,armysize,coords,id); 
 }
  
  //bottom left Char
  if(countries.contains("Char")){
 	map[8][1].makeHomeBase(players.get(countries.indexOf("Char")));
 	int[] coords = {8,0,7,0,7,1,7,2,8,2};
-	spawn(map, CharUnit,armysize,players.get(countries.indexOf("Char")),coords);
+	id=spawn(map, CharUnit,armysize,coords,id); 
  }
 
  //bottom middle is HAL Space Station
  if(countries.contains("HAL Space Station")){
 	 map[8][7].makeHomeBase(players.get(countries.indexOf("HAL Space Station"))); 
 	 int[] coords = {8,6,7,6,7,7,7,8,8,8};
-	 spawn(map, HALUnit,armysize,players.get(countries.indexOf("HAL Space Station")),coords);
+	id= spawn(map, HALUnit,armysize,coords,id); 
 }
  
  //bottom right is Borg
  if(countries.contains("Borg")){
 	 map[8][13].makeHomeBase(players.get(countries.indexOf("Borg"))); 
 	 int[] coords = {8,14,7,14,7,13,7,12,8,12};
-	 spawn(map, BorgUnit,armysize,players.get(countries.indexOf("Borg")),coords);
+	id= spawn(map, BorgUnit,armysize,coords,id); 
 }%>
+
+
+<% for (Player player: players) { %>
+<span style ="color:<%= colorCode(player) %>"> <%= player %></span><br>
+<% } %>
+<br>
+Let's make a map! <br><br>
+The "O"s represent each player's home base!<br>
+The "X"s represent impassable asteroids!<br>
+The "#"s in each territory represent the number of Units in each territory!<br>
+<br>
+<br>
+
+
 
 <font face="courier">
 <%//printing the map 
@@ -112,8 +120,9 @@ if (!map[a][b].hasResources() && !map[a][b].isHomeBase() && !map[a][b].isOccupie
  }%>
 <br>	
 <%}%>
+
 </font>
-<%//color string can be probably be stored in player 
+<%//color string can be probably be stored in player instead of making a method to calculate it
 //returns the color associated with each country %>
 <%! public String colorCode(Player player){ 
 if (player==null) {return "pink";}
@@ -125,17 +134,53 @@ else if (player.getCountry().equals("Borg")) { return "gray";}
 else if (player.getCountry().equals("HAL Space Station")) { return "orange";}
  return "";} %>
  
- <%! public void spawn(Territory[][] maps, Unit unit, int amount, Player owner,int[] coords) 
+ <%! public int spawn(Territory[][] maps, Unit unit, int amount, int[] coords,int idn) 
  {
+	
 	for(int i = 0; i < coords.length; i+=2)
 	{
-		maps[coords[i]][coords[i+1]].addUnits(unit,amount,owner);
+		for(int a = 1; a <= amount; a++)
+		{
+		Unit toBeAdded = new Unit(unit.getName(),unit.getHealth(),unit.getStrength(),unit.getDefense(),unit.getOwner());
+		toBeAdded.setID(idn++);
+		toBeAdded.setTerritory(maps[coords[i]][coords[i+1]]);
+		toBeAdded.getOwner().addUnit(toBeAdded);
+		maps[coords[i]][coords[i+1]].addUnit(toBeAdded);
+		}
 		System.out.println("Spawning "+amount+" "+unit.getName()+"(s) at ["+coords[i]+","+coords[i+1]+"]");
  	}
+	return idn;
  }
 
  %>
+ 
 
+
+<% for(Player player: players) 
+{
+	System.out.println(player.getArmy().keySet());
+	TreeMap<Integer,Unit> army = player.getArmy();
+	for(Integer idnum: army.keySet())
+		System.out.println(army.get(idnum).getTerritory());
+
+System.out.println("~~~~");
+
+}
+%>
+
+<%/*  for(Territory[] a: map) 
+	{
+	for(Territory b: a)
+		{
+			System.out.println(b);
+			System.out.println(b.getOccupants());
+		}
+	System.out.println("=====");
+
+	}
+System.out.println("~~~~");
+ */
+%>
 
 
 </head>
