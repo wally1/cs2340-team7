@@ -9,7 +9,6 @@ public class Territory implements Comparable<Territory>
 	
 	String name; //Name of territory, ie states/countries
 	int[] coordinates; //coordinate of Territory, chessboard style. length = 2, just 2 numbers. May be awkward if board is hexes and not squares
-	String region; //Board is split up into countries; which country this territory belongResourcecontinents
 	ArrayList<Resource> resources; //Resources this particular territory possesses, ie additional money to purchase troops, upgrades for troops, map information
 	boolean isOccupied; //true if there is a unit occupying the territory -> presence enough to occupy or need to spend turns capping?
 	TreeMap<Integer,Unit> occupiedByUnit; //key is unit id, value is the unit
@@ -17,11 +16,10 @@ public class Territory implements Comparable<Territory>
 	boolean occupiable;
 	boolean homeBase;
 
-public Territory(String name, int[] coords, String reg){
+public Territory(String name, int[] coords){
 	
 	this.name=name;
 	coordinates = coords;
-	region = reg; //antiquated as of now
 	resources = new ArrayList<Resource>();
 	isOccupied = false;
     occupiedByUnit = new TreeMap<Integer,Unit>();
@@ -57,6 +55,7 @@ public boolean equals(Territory other){
 	public void makeHomeBase(Player player){
 	    homeBase = true;
 	    occupiedByPlayer = player;
+	    player.setHomeBase(coordinates[0],coordinates[1]);
     } 
 	public boolean isHomeBase()
 	{
@@ -83,16 +82,16 @@ public boolean equals(Territory other){
 		if(occupiable)// not an asteroid
 		{
 			//if territory is already occupied by another player, then fight
-			if(isOccupied && !occupiedByPlayer.equals(conquerer.getOwner())) 
+/*			if(isOccupied && !occupiedByPlayer.equals(conquerer.getOwner())) 
 			{
 				//fight
 			}
 			else
-			{
+			{*/
 				isOccupied = true;
 				occupiedByUnit.put(conquerer.getID(),conquerer);
 				occupiedByPlayer = conquerer.getOwner();
-			}
+	//		}
 		}
 		else
 			System.out.println("There's something in the way!");

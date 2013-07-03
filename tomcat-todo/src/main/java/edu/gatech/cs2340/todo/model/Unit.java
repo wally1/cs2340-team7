@@ -13,6 +13,7 @@ public class Unit
 	Player owner; //who owns this Unit
 	Territory previouslyOccupied;
 	Territory occupying;
+	Random rand = new Random();
 	
 	public  Unit(String name, int health, int strength, int defense, Player owner)
 	{
@@ -30,6 +31,10 @@ public class Unit
 	public String getName()
 	{
 		return name;
+	}
+	public void damage(int a)
+	{
+		health-=a;
 	}
 	public int getHealth()
 	{
@@ -74,16 +79,20 @@ public class Unit
 	{
 		return previouslyOccupied;
 	}
-	public void attack(Unit enemy)
+	//this unit attacks the parameter unit, will probably involve a "dice roll" (RNG 1-6) multiplied by the attacker's attack minus 
+	//the defender's defense multiplied by a dice roll. More or less die rolls may depends on the specific attack/defense modifier
+	//the result will be subtracted from the defender's hp
+	public int[] attack(Unit enemy)
 	{	
-		//this unit attacks the parameter unit, will probably involve a "dice roll" (RNG 1-6) multiplied by the attacker's attack minus 
-		//the defender's defense multiplied by a dice roll. More or less die rolls may depends on the specific attack/defense modifier
-		//the result will be subtracted from the defender's hp
+//		int numdice = 1; //maybe more dice for whatever reason ie. flanking attack bonus, etc.
+		int dmg = (rand.nextInt(6)+1)*strength-(rand.nextInt(6)+1)*enemy.getDefense();
+		enemy.damage(dmg);
 		
-		//if the defender is still alive, he will counterattack(?).
+		int edmg = (rand.nextInt(6)+1)*enemy.getStrength()-(rand.nextInt(6)+1)*defense;
+		damage(edmg);
 		
-
-		
+		int[] ret = {dmg,edmg};
+		return ret;
 		//need to make get methods for health/str/def
 	}
 	public String toString()

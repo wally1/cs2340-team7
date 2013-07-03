@@ -1,7 +1,8 @@
 package edu.gatech.cs2340.todo.controller;
 
-
+import edu.gatech.cs2340.todo.model.Territory;
 import edu.gatech.cs2340.todo.model.Player;
+import edu.gatech.cs2340.todo.model.Unit;
 import edu.gatech.cs2340.todo.model.RiskGame;
 import java.util.*;
 import java.io.IOException;
@@ -23,18 +24,22 @@ import javax.servlet.http.HttpServletResponse;
     })
 public class TodoServlet extends HttpServlet {
 
-    ArrayList<Player> players = new ArrayList<Player>();
+ 	RiskGame game = new RiskGame(1);
+    ArrayList<Player> players = game.getPlayers();
 
+    
     @Override
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response)
             throws IOException, ServletException {
+    	
         System.out.println("In doPost()");
    
         // Handle the hidden HTML form field that simulates
         // HTTP PUT and DELETE methods.
         String operation = (String) request.getParameter("operation");
         System.out.println(operation);
+        System.out.println("It is turn "+game.getCurrTurn());
         // If form didn't contain an operation field and
         // we're in doPost(), the operation is POST
      
@@ -49,11 +54,62 @@ public class TodoServlet extends HttpServlet {
         else if (operation.equalsIgnoreCase("DELETE")) {
             System.out.println("Delegating to doDelete().");
             doDelete(request, response);
-            
-        } else if (operation.equalsIgnoreCase("CONFIRMATION")) {
-        	if(players.size() > 2 && players.size() < 7 && seperateCountries(players)){
-        	System.out.println("CONFIRMATION CONFIRMATION CONFIRMATION!");
-        	request.setAttribute("players", players);
+        }
+        else if(operation.equalsIgnoreCase("SPAWN")) {
+        	System.out.println("We're SPAWNING more units!");
+            	int a = Integer.parseInt(request.getParameter("Coord1"));
+            	int b = Integer.parseInt(request.getParameter("Coord2"));
+            	Player currplayer = game.getPlayers().get(game.getCurrTurn());
+            	request.setAttribute("currplayer",currplayer);
+            	Unit unit = new Unit("Space Frigate",40,6,0,currplayer);
+            	int[] co = {a,b};
+            	
+            	if(check(co,currplayer))
+            	{
+            	game.spawn(game.getMap(),unit, 1, co, game.getID());
+            	game.nextTurn();
+            	System.out.println("It is now turn "+game.getCurrTurn());
+            	Territory[][] newMap = game.getMap();
+            	players = game.getPlayers();
+            	request.setAttribute("players",players);
+            	request.setAttribute("map",newMap);
+            	currplayer = game.getPlayers().get(game.getCurrTurn());
+            	request.setAttribute("currplayer",currplayer);
+            	
+            	RequestDispatcher dispatcher = 
+                        getServletContext().getRequestDispatcher("/confirmation.jsp");
+                        dispatcher.forward(request,response);
+            	}
+            	else
+            	{
+            		System.out.println("You can't spawn there!");
+                	Territory[][] newMap = game.getMap();
+                	players = game.getPlayers();
+                	request.setAttribute("players",players);
+                	request.setAttribute("map",newMap);
+       
+                	
+                	RequestDispatcher dispatcher = 
+                            getServletContext().getRequestDispatcher("/confirmation.jsp");
+                            dispatcher.forward(request,response);
+                	
+            	}
+            	
+            } 
+        else if (operation.equalsIgnoreCase("CONFIRMATION")) {
+        	
+        	if(players.size() > 2 && players.size() < 7 && seperateCountries(players))
+        	{
+        	
+        	game.finishAddingPlayers();
+        	game.finishConfirmation();
+        	Territory[][] map = game.initializeBoard();
+        	request.setAttribute("players",players);
+        	request.setAttribute("turn",game.getCurrTurn());
+        	Player currplayer = game.getPlayers().get(game.getCurrTurn());
+        	request.setAttribute("currplayer",currplayer);
+        	request.setAttribute("map",game.getMap());
+        	System.out.println("We're starting the game! It's turn "+game.getCurrTurn());
             RequestDispatcher dispatcher = 
             getServletContext().getRequestDispatcher("/confirmation.jsp");
             dispatcher.forward(request,response);
@@ -66,56 +122,68 @@ public class TodoServlet extends HttpServlet {
                         getServletContext().getRequestDispatcher("/list.jsp");
                         dispatcher.forward(request,response);
         	}
+      
         } else if (operation.equalsIgnoreCase("ADD")){ //add
         	
         	if(players.size() <6)
         	{
-        		System.out.println("We're adding a player!");
-            String name = request.getParameter("Name");
-            String country = request.getParameter("Country"); 
-            players.add(new Player(name,country));
+        	String name = request.getParameter("Name");
+        	String country = request.getParameter("Country");
+        	game.addPlayer(name,country);
+        	players = game.getPlayers();
             request.setAttribute("players", players);
+        	request.setAttribute("turn",game.getCurrTurn());
             RequestDispatcher dispatcher = 
                 getServletContext().getRequestDispatcher("/list.jsp");
             dispatcher.forward(request,response);
-
         	}
         	else
         	{
         		System.out.println("There are too many players!!!");
         		   request.setAttribute("players", players);
+        		 	request.setAttribute("turn",game.getCurrTurn());
         		   RequestDispatcher dispatcher = 
         	                getServletContext().getRequestDispatcher("/list.jsp");
         	            dispatcher.forward(request,response);
         	}
         }
     }
-
-    //makes sure each player is representing a different country
-    protected Boolean seperateCountries(ArrayList<Player> players)
+    protected boolean check(int[] coords, Player player)
     {
-    	System.out.println("The size of the array "+players.size());
-    	boolean go = true;
-    	//0-1 size =3
-    	for(int a = 0; a<players.size()-1;a++)
-    	{ //1-2
-    		for(int b = a+1; b<players.size();b++)
-    		{
-    			System.out.println(a+" "+b);
-    			if(players.get(a).getCountry().equals(players.get(b).getCountry()))
-    			{	
-    				System.out.println("Brothers can't fight brothers!");
-    				go = false;
-    				break;
-    			}
-    		}
-    		
-    	}
-    	return go;
+    	int homebasey = player.getHomebaseCoords()[0];
+    	int homebasex = player.getHomebaseCoords()[1];
+    	
+    	int y = coords[0];
+    	int x = coords[1];
+    	
+    	return Math.abs(homebasey-y) <= 1 && Math.abs(homebasex-x) <=1;
+    	
     	
     }
+
+    //makes sure each player is representing a different country
+    protected boolean seperateCountries(ArrayList<Player> players)
+    {
+     System.out.println("The size of the array "+players.size());
+     boolean go = true;
+     //0-1 size =3
+     for(int a = 0; a<players.size()-1;a++)
+     { //1-2
+     for(int b = a+1; b<players.size();b++)
+     {
+     System.out.println(a+" "+b);
+     if(players.get(a).getCountry().equals(players.get(b).getCountry()))
+     {	
+     System.out.println("Brothers can't fight brothers!");
+     go = false;
+     break;
+     }
+     }
     
+     }
+     return go;
     
+    }
     /**
      * Called when HTTP method is GET 
      * (e.g., from an <a href="...">...</a> link).
@@ -128,6 +196,7 @@ public class TodoServlet extends HttpServlet {
    //     System.out.println("Starting a new game, erasing the player ArrayList");
 
         request.setAttribute("players", players);
+    	request.setAttribute("turn",game.getCurrTurn());
         RequestDispatcher dispatcher = 
             getServletContext().getRequestDispatcher("/list.jsp");
         dispatcher.forward(request,response);
@@ -163,8 +232,9 @@ public class TodoServlet extends HttpServlet {
             throws IOException, ServletException {
         System.out.println("In doDelete()");
         int id = getId(request);
-        players.remove(id);
+        game.removePlayer(id);
         request.setAttribute("players", players);
+    	request.setAttribute("turn",game.getCurrTurn());
         RequestDispatcher dispatcher = 
             getServletContext().getRequestDispatcher("/list.jsp");
         dispatcher.forward(request,response);

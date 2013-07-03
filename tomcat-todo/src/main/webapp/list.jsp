@@ -35,7 +35,7 @@ The number of players is <%=players.size() %><br>
   <td><input type="submit" value="Update"/></td>
 
 Player <%=id+1%>'s name is <%= player.getName() %> <br>
-Player <%=id+1%> is from <%= player.getCountry() %> <br>
+Player <%=id+1%> is from <span style ="color:<%= colorCode(player) %>"> <%= player.getCountry() %></span><br>
 </form>
 <td valign="middle">
   <form action="/todo/delete/<%= id %>" method="POST">
@@ -80,6 +80,16 @@ for(int c = 0; c < players.size(); c++)
 
 
 <td></td>
+
+<%! public String colorCode(Player player){ 
+if (player==null) {return "pink";}
+else if (player.getCountry().equals("Polaris")) { return "purple";}
+else if (player.getCountry().equals("Alpha-Centauri")) { return "green";}
+else if (player.getCountry().equals("Char")) { return "red";} 
+else if (player.getCountry().equals("Midichloria")) { return "blue";}
+else if (player.getCountry().equals("Borg")) { return "gray";} 
+else if (player.getCountry().equals("HAL Space Station")) { return "orange";}
+ return "";} %>
 
 <input type ="submit"  value ="Finish!"/>
 </form>

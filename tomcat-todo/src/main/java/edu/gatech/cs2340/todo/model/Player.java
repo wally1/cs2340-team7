@@ -9,19 +9,22 @@ public class Player implements Comparable<Player>
     String country;
     String color;
     int turn;
-    TreeMap<Territory,Integer> occupiedTerritories; //A map of all territories occupied by this player, since multiple units can occupy the same territory
+    TreeMap<String,Integer> occupiedTerritories; //A map of all territories occupied by this player, since multiple units can occupy the same territory
     												//the territory will be the key, the number of units will be the stored value
+    											//is this even needed?
 //	ArrayList<Resource> ownedResources; //A List of all resources owned by the player
     TreeMap<Integer,Unit> army; //key is Unit ID, value is the actual Unit
     boolean hasLost;
+    int[] homebase;
 
     public Player(String title, String task) { //constructors may be temporary, may later intialize with x army, y turn, etc. 
         name = title;
         country = task;
         turn = 0;  
         army = new TreeMap<Integer,Unit>();
-        occupiedTerritories= new TreeMap<Territory,Integer>();
+        occupiedTerritories= new TreeMap<String,Integer>();
         hasLost = false;
+        homebase = new int[2];
     }
     public int compareTo(Player other){
     	if(turn < other.getTurn())
@@ -33,6 +36,15 @@ public class Player implements Comparable<Player>
     		return true;
     	return false;
     		
+    }
+    public void setHomeBase(int a, int b)
+    {
+    	homebase[0] = a;
+    	homebase[1] = b;
+    }
+    public int[] getHomebaseCoords()
+    {
+    	return homebase;
     }
     public void setName(String title) {
         name = title;
@@ -55,7 +67,17 @@ public class Player implements Comparable<Player>
     public void addUnit(Unit unit) 
     {	
     	army.put(unit.getID(),unit);	
-    	update(unit.getID());
+    	
+    	String terr = unit.getTerritory().getName();
+    	if(occupiedTerritories.containsKey(terr))
+    	{
+    		int currUnitAmt = occupiedTerritories.get(terr);
+    		occupiedTerritories.put(terr, currUnitAmt+1);
+    	}
+    	else
+    		occupiedTerritories.put(terr,1);
+    	
+    //	update(unit.getID());
     }
     public TreeMap<Integer,Unit> getArmy()
     {
@@ -65,7 +87,7 @@ public class Player implements Comparable<Player>
     {
     	return army.size();
     }
-    public TreeMap<Territory,Integer> getOccupiedTerritories()
+    public TreeMap<String,Integer> getOccupiedTerritories()
     {
     	return occupiedTerritories;
     }
@@ -74,7 +96,7 @@ public class Player implements Comparable<Player>
     public void update()
     {
     	//probably a more elegant way to do this with iterator
-    	ArrayList<Integer> toBeRemoved = new ArrayList<Integer>();
+    	/*ArrayList<Integer> toBeRemoved = new ArrayList<Integer>();
     	for(int id: army.keySet())
     	{
     		if(army.get(id).getHealth() <= 0)
@@ -87,7 +109,7 @@ public class Player implements Comparable<Player>
     	for(int id: toBeRemoved)
     	{
     		army.remove(id);
-    	}
+    	}*/
     }
     public void update(int id)
     {
@@ -133,7 +155,7 @@ public class Player implements Comparable<Player>
     {
     	hasLost = true;
     	army = new TreeMap<Integer,Unit>();
-    	occupiedTerritories = new TreeMap<Territory,Integer>();
+    	occupiedTerritories = new TreeMap<String,Integer>();
     }
     public String toString() {	
     	return name +" from "+country+" has an army with " +army.size()+" units in it and goes on turn "+turn+"\n\n";
