@@ -14,6 +14,8 @@ public class Unit
 	Territory previouslyOccupied;
 	Territory occupying;
 	Random rand = new Random();
+	boolean attacked;
+	boolean moved;
 	
 	public  Unit(String name, int health, int strength, int defense, Player owner)
 	{
@@ -26,13 +28,15 @@ public class Unit
 		this.owner = owner;
 		previouslyOccupied = null;
 		occupying = null;
+		attacked = false;
+		moved = false;
 		
 	}
 	public String getName()
 	{
 		return name;
 	}
-	public void damage(int a)
+	public void takeDamage(int a)
 	{
 		health-=a;
 	}
@@ -70,6 +74,7 @@ public class Unit
 	{
 		previouslyOccupied = occupying;
 		occupying = location;
+		moved = true;
 	}
 	public Territory getTerritory()
 	{
@@ -83,22 +88,37 @@ public class Unit
 	//the defender's defense multiplied by a dice roll. More or less die rolls may depends on the specific attack/defense modifier
 	//the result will be subtracted from the defender's hp
 	public int[] attack(Unit enemy)
-	{	
-//		int numdice = 1; //maybe more dice for whatever reason ie. flanking attack bonus, etc.
-		int dmg = (rand.nextInt(6)+1)*strength-(rand.nextInt(6)+1)*enemy.getDefense();
-		enemy.damage(dmg);
-		
-		int edmg = (rand.nextInt(6)+1)*enemy.getStrength()-(rand.nextInt(6)+1)*defense;
-		damage(edmg);
-		
-		int[] ret = {dmg,edmg};
-		return ret;
-		//need to make get methods for health/str/def
+	{
+//currently only 1 die roll per modifier. Maybe more alongside future implmentations ie. flanking attack bonus/certain items, etc.
+		int attackDice = rand.nextInt(6)+1;
+		int enemyDefenseDice = rand.nextInt(6)+1;
+		int enemyAttackDice = rand.nextInt(6)+1;
+		int defenseDice = rand.nextInt(6)+1;
+		int counterAttackDice = rand.nextInt(6)+1;
+		int damage = attackDice*strength-enemyDefenseDice*enemy.getDefense();
+		enemy.takeDamage(damage);
+		int enemyDamage = enemyAttackDice*enemy.getStrength()-defenseDice*defense;
+		enemyDamage = counterAttackDice/6*enemyDamage; //counterattack damage reduced by a factor of die roll
+		takeDamage(enemyDamage);
+		attacked = true;
+	
+		int[] dice = {attackDice,enemyDefenseDice,enemyAttackDice,defenseDice,counterAttackDice,damage,enemyDamage};
+		return dice;
 	}
+
+
+	public boolean getAttacked(){
+		return attacked;
+	}
+	
+	public boolean getMoved(){
+		return moved;
+	}	
+	
 	public String toString()
 	{
 		return name+" with identification number "+getID()+" currently has "+health+" hit points, is located at "+occupying+
-				" and is owned by "+owner.getName();
+				" and is owned by "+owner.getName()+"\nHas Moved:"+moved+" Has Attacked:"+attacked;
 	}
 	
 	

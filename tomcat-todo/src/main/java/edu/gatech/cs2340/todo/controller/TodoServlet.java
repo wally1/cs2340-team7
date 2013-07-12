@@ -40,6 +40,7 @@ public class TodoServlet extends HttpServlet {
         String operation = (String) request.getParameter("operation");
         System.out.println(operation);
         System.out.println("It is turn "+game.getCurrTurn());
+		  
         // If form didn't contain an operation field and
         // we're in doPost(), the operation is POST
      
@@ -96,6 +97,58 @@ public class TodoServlet extends HttpServlet {
             	}
             	
             } 
+				
+			else if(operation.equalsIgnoreCase("TERRITORY")){
+				System.out.println("Displaying Units");
+				String territory = request.getParameter("Players");
+				String subA = territory.substring(territory.length()-4, territory.length()-3);
+				String subB = territory.substring(territory.length()-2, territory.length()-1);
+				int coA = Integer.parseInt(subA);
+				int coB = Integer.parseInt(subB);
+				TreeMap<Integer,Unit> occupants = game.getMap()[coA][coB].getOccupants();
+				
+								
+				Territory[][] newMap = game.getMap();
+				Player currplayer = game.getPlayers().get(game.getCurrTurn());
+            	request.setAttribute("currplayer",currplayer);
+            	players = game.getPlayers();
+            	request.setAttribute("players",players);
+            	request.setAttribute("map",newMap);
+					request.setAttribute("occupants",occupants);
+            	currplayer = game.getPlayers().get(game.getCurrTurn());
+            	request.setAttribute("currplayer",currplayer);
+            	
+            	RequestDispatcher dispatcher = 
+                        getServletContext().getRequestDispatcher("/confirmation.jsp");
+                        dispatcher.forward(request,response);
+			}
+				
+				
+		/*  else if (operation.equalsIgnoreCase("Territory")) {
+		  //change to "Select Territories"
+		  		System.out.println("Time to attack!");
+														
+					Player currplayer = game.getPlayers().get(game.getCurrTurn());
+            	request.setAttribute("currplayer",currplayer);
+					
+					int[] occupiedTerritoryCoordinates = Integer.parseInt(request.getParameter("Coordinates"));
+					TreeMap<Integer,Unit> units = map[occupiedTerritoryCoordinates[0]][occupiedTerritoryCoordinates[1]].getOccupants();
+					request.setAttribute("units",units);
+											
+		//start "ATTACK!" here
+					for (int i = 0; i < units.length; i++){
+						
+					int a = Integer.parseInt(request.getParameter("Coord1"));
+            	int b = Integer.parseInt(request.getParameter("Coord2"));
+					int[] ab = {a,b};
+					
+						if ((map[a][b].getOwner()!=currplayer) && (checkAdjacent(occupiedTerritoryCoordinates, ab)) && (map[a][b].getOwner()!=null){
+							Player enemy = map[a][b].getOwner();
+						}
+					
+							
+		*/			
+					
         else if (operation.equalsIgnoreCase("CONFIRMATION")) {
         	
         	if(players.size() > 2 && players.size() < 7 && seperateCountries(players))
@@ -160,6 +213,20 @@ public class TodoServlet extends HttpServlet {
     	
     	
     }
+
+/*	protected boolean checkAdjacent(int[] homeCo; int[] adjacentCo){
+		int homeX = homeCo[1];
+		int homeY = homeCo[0];
+		
+		int adjX = adjacentCo[1];
+		int adjY = adjacentCo[0];
+		
+		return Math.abs(homeX-adjX) <= 1 && Math.abs(homeY-adjY) <=1;
+		
+		
+	}
+*/	
+		
 
     //makes sure each player is representing a different country
     protected boolean seperateCountries(ArrayList<Player> players)
