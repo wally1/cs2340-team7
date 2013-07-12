@@ -17,6 +17,8 @@ public class Unit
 	Territory previouslyOccupied;
 	Territory occupying;
 	Random rand = new Random();
+	boolean attacked;
+	boolean moved;
 	
 	public  Unit(String name, int health, int strength, int defense)
 	{
@@ -42,6 +44,8 @@ public class Unit
 		this.owner = owner;
 		previouslyOccupied = null;
 		occupying = null;
+		attacked = false;
+		moved = false;
 		
 	}
 	public String getName()
@@ -89,6 +93,7 @@ public class Unit
 	{
 		previouslyOccupied = occupying;
 		occupying = location;
+		moved = true;
 	}
 	public void move(Territory newLocation)
 	{
@@ -103,36 +108,20 @@ public class Unit
 	{
 		return previouslyOccupied;
 	}
-	public int[] attack(Unit enemy)
-	{	
-//		currently only 1 die roll per modifier. Maybe more alongside future implmentations ie. flanking attack bonus/certain items, etc.
-		int attackDice = rand.nextInt(6)+1;
-		int enemyDefenseDice = rand.nextInt(6)+1;
-		int enemyAttackDice = rand.nextInt(6)+1;
-		int defenseDice = rand.nextInt(6)+1;
-		int counterAttackDice = rand.nextInt(6)+1;
-		
-		int damage = attackDice*strength-enemyDefenseDice*enemy.getDefense();
-		enemy.takeDamage(damage);
-		
-		int enemyDamage = enemyAttackDice*enemy.getStrength()-defenseDice*defense;
-		enemyDamage = counterAttackDice/6*enemyDamage; //counterattack damage reduced by a factor of die roll
-		takeDamage(enemyDamage);
-		
-		int[] dice = {attackDice,enemyDefenseDice,enemyAttackDice,defenseDice,counterAttackDice,damage,enemyDamage};
-		return dice;
+
+	public boolean getAttacked(){
+		return attacked;
 	}
-	public Unit clone()
-	{
-		Unit a = new Unit(this.getName(),this.getMaxHealth(),this.getStrength(),this.getDefense());
-		a.setTerritory(occupying);
-		a.setOwner(owner);
-		return a;
-	}
+	
+	public boolean getMoved(){
+		return moved;
+	}	
+	
 	public String toString()
 	{
-		return name+" with identification number "+getID()+" currently has "+health+"/"+maxHealth+" hit points, is located at "+occupying+
-				" and is owned by "+owner.getName();
+		return name+" with identification number "+getID()+" currently has "+health+" hit points, is located at "+occupying+
+				" and is owned by "+owner.getName()+"\nHas Moved:"+moved+" Has Attacked:"+attacked;
+
 	}
 
 }

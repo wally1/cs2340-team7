@@ -20,6 +20,7 @@
 ArrayList<Player> players = (ArrayList<Player>) request.getAttribute("players");
 Territory[][] map = (Territory[][]) request.getAttribute("map"); 
 Player currPlayer = (Player) request.getAttribute("currplayer");
+TreeMap<Integer,Unit> occupants = (TreeMap<Integer,Unit>) request.getAttribute("occupants");
 Collections.sort(players);%>
 
 
@@ -54,7 +55,46 @@ It's <span style="color<%=colorCode(currPlayer)%>"><%=currPlayer.getName()%>'s t
 </form>
 
 
+<form action = "update" method="POST">
+<input type="hidden" name = "operation" value = "TERRITORY"/>
+<select name = "Players">
+<%TreeMap<String,Integer> terr = currPlayer.getOccupiedTerritories();
+	for(String key: terr.keySet()) {%>
+<option value = "<%=key%>"><%=key%></option>
+<%} %>
+<input type="submit" value="Update"/>
+</select>
+</form>
 
+
+<form action = "update" method="POST">
+<intput type="hidden" name ="operation" value = "UNITS" />
+<select name = "Units">
+	for(String key: occupants.keySet()) {%>
+	<option value = "<%=key%>"><%=key%></option>
+<%} %>
+<input type="submit" value="Update"/>
+</select>
+</form>	
+
+
+<form action = "update" method="POST">
+<input type="hidden" name = "operation" value = "ATTACK"/>
+<input type="text" name="Coord1"/>
+<input type="text" name="Coord2"/>
+
+<input type="submit" value="Attack!" />
+</form>
+
+<form action = "update" method="POST">
+<input type="hidden" name = "operation" value = "MOVE"/>
+<input type="text" name="Coord1"/>
+<input type="text" name="Coord2"/>
+
+<input type="submit" value="Move!" />
+</form>
+
+<br>
 
 [~]<% for(int a = 0; a < 15;a++){ %>[<%=a%>]<%}%>
 <br>
