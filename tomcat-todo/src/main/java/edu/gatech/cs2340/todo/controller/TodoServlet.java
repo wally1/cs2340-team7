@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
     })
 public class TodoServlet extends HttpServlet {
 
+	//List of RiskGames so you can new/load game?
  	RiskGame game = new RiskGame(1);
     ArrayList<Player> players = game.getPlayers();
 
@@ -44,58 +45,57 @@ public class TodoServlet extends HttpServlet {
         // we're in doPost(), the operation is POST
      
         //probably more elegant fix later, like just changing operation to "Confirmation"
-        if (null == operation){operation = "CONFIRMATION";}
+        if (null == operation)
+        {
+        	operation = "CONFIRMATION";
+        }
     
         
-        if (operation.equalsIgnoreCase("PUT")) {
+        if (operation.equalsIgnoreCase("PUT")) 
+        {
             System.out.println("Delegating to doPut().");
             doPut(request, response);
         } 
-        else if (operation.equalsIgnoreCase("DELETE")) {
+        else if (operation.equalsIgnoreCase("DELETE")) 
+        {
             System.out.println("Delegating to doDelete().");
             doDelete(request, response);
         }
-        else if(operation.equalsIgnoreCase("SPAWN")) {
+        else if(operation.equalsIgnoreCase("SPAWN")) 
+        {
         	System.out.println("We're SPAWNING more units!");
-            	int a = Integer.parseInt(request.getParameter("Coord1"));
-            	int b = Integer.parseInt(request.getParameter("Coord2"));
-            	Player currplayer = game.getPlayers().get(game.getCurrTurn());
-            	request.setAttribute("currplayer",currplayer);
-            	Unit unit = new Unit("Space Frigate",40,6,0,currplayer);
-            	int[] co = {a,b};
+           	int a = Integer.parseInt(request.getParameter("Coord1"));
+           	int b = Integer.parseInt(request.getParameter("Coord2"));
+           	Player currplayer = game.getPlayers().get(game.getCurrTurn());
+           	request.setAttribute("currplayer",currplayer);
+           	Unit unit = new Unit("Space Frigate",40,6,0,currplayer); //probably need to give all races same unit, or ugly fix later
+           	int[] co = {a,b};
+           	Territory[][] newMap = game.getMap();
+           	players = game.getPlayers();
+           	request.setAttribute("players",players);
+           	request.setAttribute("map",newMap);
+           	
+           	if(check(co,currplayer))
+           	{
+           	game.spawn(game.getMap(),unit, 1, co, game.getID());
+           	game.nextTurn();
+           	System.out.println("It is now turn "+game.getCurrTurn());
+           	newMap = game.getMap();
+           	request.setAttribute("map",newMap);
+           	currplayer = game.getPlayers().get(game.getCurrTurn());
+           	request.setAttribute("currplayer",currplayer);
+           	
+           	RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/confirmation.jsp");
+            dispatcher.forward(request,response);
+            }
+            else
+            {
+            	System.out.println("You can't spawn there!");
+               	RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/confirmation.jsp");
+                dispatcher.forward(request,response); 	
+            }
             	
-            	if(check(co,currplayer))
-            	{
-            	game.spawn(game.getMap(),unit, 1, co, game.getID());
-            	game.nextTurn();
-            	System.out.println("It is now turn "+game.getCurrTurn());
-            	Territory[][] newMap = game.getMap();
-            	players = game.getPlayers();
-            	request.setAttribute("players",players);
-            	request.setAttribute("map",newMap);
-            	currplayer = game.getPlayers().get(game.getCurrTurn());
-            	request.setAttribute("currplayer",currplayer);
-            	
-            	RequestDispatcher dispatcher = 
-                        getServletContext().getRequestDispatcher("/confirmation.jsp");
-                        dispatcher.forward(request,response);
-            	}
-            	else
-            	{
-            		System.out.println("You can't spawn there!");
-                	Territory[][] newMap = game.getMap();
-                	players = game.getPlayers();
-                	request.setAttribute("players",players);
-                	request.setAttribute("map",newMap);
-       
-                	
-                	RequestDispatcher dispatcher = 
-                            getServletContext().getRequestDispatcher("/confirmation.jsp");
-                            dispatcher.forward(request,response);
-                	
-            	}
-            	
-            } 
+        } 
         else if (operation.equalsIgnoreCase("CONFIRMATION")) {
         	
         	if(players.size() > 2 && players.size() < 7 && seperateCountries(players))
@@ -162,6 +162,7 @@ public class TodoServlet extends HttpServlet {
     }
 
     //makes sure each player is representing a different country
+    //redundant with RiskGame
     protected boolean seperateCountries(ArrayList<Player> players)
     {
      System.out.println("The size of the array "+players.size());

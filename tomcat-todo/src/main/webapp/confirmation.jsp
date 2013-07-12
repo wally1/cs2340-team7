@@ -22,6 +22,8 @@ Territory[][] map = (Territory[][]) request.getAttribute("map");
 Player currPlayer = (Player) request.getAttribute("currplayer");
 Collections.sort(players);%>
 
+
+
 <% for (Player player: players) { %>
 <span style ="color:<%= colorCode(player) %>"> <%= player %></span><br>
 <% } %>
@@ -32,6 +34,13 @@ The "X"s represent impassable asteroids!<br>
 The "#"s in each territory represent the number of Units in each territory!<br>
 <br>
 <br>
+
+<select name = "Players">
+<% TreeMap<String,Integer> terr = currPlayer.getOccupiedTerritories();
+for(String key: terr.keySet()) {%>
+<option value = "<%=key%>"><%=key%></option>
+<%} %>
+</select>
 
 <font face="courier">
 
@@ -47,7 +56,7 @@ It's <span style="color<%=colorCode(currPlayer)%>"><%=currPlayer.getName()%>'s t
 
 
 
-[~]<% for(int a = 0; a < 14;a++){ %>[<%=a%>]<%}%>
+[~]<% for(int a = 0; a < 15;a++){ %>[<%=a%>]<%}%>
 <br>
 <%//printing the map 
   for(int a = 0; a <9; a++)
