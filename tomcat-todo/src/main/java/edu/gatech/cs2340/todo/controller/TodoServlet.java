@@ -41,6 +41,9 @@ public class TodoServlet extends HttpServlet {
         System.out.println(operation);
         System.out.println("It is turn "+game.getCurrTurn());
 		  
+	
+				
+		  
         // If form didn't contain an operation field and
         // we're in doPost(), the operation is POST
      
@@ -101,8 +104,11 @@ public class TodoServlet extends HttpServlet {
 			else if(operation.equalsIgnoreCase("TERRITORY")){
 				System.out.println("Displaying Units");
 				String territory = request.getParameter("Players");
-				String subA = territory.substring(territory.length()-4, territory.length()-3);
-				String subB = territory.substring(territory.length()-2, territory.length()-1);
+				int index = territory.indexOf('[');
+				int index2 = territory.indexOf(']');
+				int indexC = territory.indexOf(',');
+				String subA = territory.substring(index+1,indexC);
+				String subB = territory.substring(indexC+1,index2);
 				int coA = Integer.parseInt(subA);
 				int coB = Integer.parseInt(subB);
 				TreeMap<Integer,Unit> occupants = game.getMap()[coA][coB].getOccupants();
@@ -122,8 +128,84 @@ public class TodoServlet extends HttpServlet {
                         getServletContext().getRequestDispatcher("/confirmation.jsp");
                         dispatcher.forward(request,response);
 			}
+			
+			
+//ATTACK code I was working on but was receiving a lot of errors. Please disregard this if you're almost done writing 
+//the attack code anyways. 
+
+		/*	else if(operation.equalsIgnoreCase("ATTACK")){
+				String[] units = request.getAttribute("unit");
+				int enemyX = Integer.parseInt(request.getParameter("Attack_Co1"));
+				int enemyY = Integer.parseInt(request.getParameter("Attack_Co2"));
 				
+				Player currplayer = (Player)request.getAttribute("currplayer");
+				int index = currplayer.indexOf('[');
+				int index2 = currplayer.indexOf(']');
+				int indexC = currplayer.indexOf(',');
+				String subA = currplayer.substring(index+1,indexC);
+				String subB = currplayer.substring(indexC+1,index2);
+				int unitX = Integer.parseInt(subA);
+				int unitY = Integer.parseInt(subB);
 				
+					if(checkAdjacent({enemyX,enemyY},{unitX,unitY}) && checkEnemyTerritory({enemyX,enemyY},currplayer)){
+						TreeMap<Integer,Unit> enemyUnits = game.getMap()[enemyX][enemyY].getOccupants();
+						TreeMap<Integer,Unit> playerUnits = game.getMap()[unitX][unitY].getOccupants();
+							
+						Collection playerEntries = playerUnits.values();
+						Collection enemyEntries = enemyUnits.values();
+								
+						Iterator playerItr = playerEntries.iterator();
+						Iterator enemyItr = enemyEntries.iterator();
+								
+						String[] resultArray = new String[100];
+						int index = 0;
+								
+							if(enemyUnits.size()=>playerUnits.size()){
+									
+									while(playerItr.hasNext()){
+										Unit playerUnit = playerItr.next();
+										Unit enemyUnit = enemyItr.next();
+										
+											if (!playerUnit.getAttacked()){
+												int[] attackResult = playerUnit.attack(enemyUnit);
+												String resultString = "Your rolls\nAttack Dice:"+attackResult[1]+"\nDefense Dice:"
+												+attackResult[4]+"\nEnemy Attack Dice:"+attackResult[3]+"\nEnemy Defense Dice:"
+												+attackResult[2]+"\nUnit "+playerUnit.getID()+"with owner "+playerUnit.getOwner().getName()
+												+"took "+attackResult[6]+" damage.\nUnit "+enemyUnit.getID()+"with owner "+enemyUnit.getOwner().getName()
+												+"took "+attackResult[7]+" damage.";
+												resultArray[index] = resultString;
+												index++;
+											}	
+											else {
+												System.out.println("This Unit has already attacked!");
+											}
+									}	
+								}
+																
+								else {
+											
+									while(enemyItr.hasNext()){
+										Unit playerUnit = playerItr.next();
+										Unit enemyUnit = enemyItr.next();
+											if (!playerUnit.getAttacked()){
+												int[] attackResult = playerUnit.attack(enemyUnit);
+												String resultString = "Your rolls\nAttack Dice:"+attackResult[1]+"\nDefense Dice:"
+												+attackResult[4]+"\nEnemy Attack Dice:"+attackResult[3]+"\nEnemy Defense Dice:"
+												+attackResult[2]+"\nUnit "+playerUnit.getID()+"with owner "+playerUnit.getOwner().getName()
+												+"took "+attackResult[6]+" damage.\nUnit "+enemyUnit.getID()+"with owner "+enemyUnit.getOwner().getName()
+												+"took "+attackResult[7]+" damage.";
+												resultArray[index] = resultString;
+												index++;
+											}
+											else {
+												System.out.println("This Unit has already attacked!");
+											}
+									}
+					}			
+			}
+			request.setAttribute("attackArray",resultArray);
+		}
+		*/
 		/*  else if (operation.equalsIgnoreCase("Territory")) {
 		  //change to "Select Territories"
 		  		System.out.println("Time to attack!");
@@ -150,7 +232,9 @@ public class TodoServlet extends HttpServlet {
 		*/			
 					
         else if (operation.equalsIgnoreCase("CONFIRMATION")) {
-        	
+        		
+				
+			
         	if(players.size() > 2 && players.size() < 7 && seperateCountries(players))
         	{
         	
@@ -162,6 +246,19 @@ public class TodoServlet extends HttpServlet {
         	Player currplayer = game.getPlayers().get(game.getCurrTurn());
         	request.setAttribute("currplayer",currplayer);
         	request.setAttribute("map",game.getMap());
+			
+			TreeMap<String,Integer> terr = currplayer.getOccupiedTerritories();
+			String territory = terr.firstKey();
+				int index = territory.indexOf('[');
+				int index2 = territory.indexOf(']');
+				int indexC = territory.indexOf(',');
+				String subA = territory.substring(index+1,indexC);
+				String subB = territory.substring(indexC+1,index2);
+				int coA = Integer.parseInt(subA);
+				int coB = Integer.parseInt(subB);
+				TreeMap<Integer,Unit> occupants = game.getMap()[coA][coB].getOccupants();
+				request.setAttribute("occupants",occupants);
+			
         	System.out.println("We're starting the game! It's turn "+game.getCurrTurn());
             RequestDispatcher dispatcher = 
             getServletContext().getRequestDispatcher("/confirmation.jsp");
@@ -211,23 +308,41 @@ public class TodoServlet extends HttpServlet {
     	
     	return Math.abs(homebasey-y) <= 1 && Math.abs(homebasex-x) <=1;
     	
-    	
     }
 
-/*	protected boolean checkAdjacent(int[] homeCo; int[] adjacentCo){
-		int homeX = homeCo[1];
-		int homeY = homeCo[0];
-		
-		int adjX = adjacentCo[1];
-		int adjY = adjacentCo[0];
-		
-		return Math.abs(homeX-adjX) <= 1 && Math.abs(homeY-adjY) <=1;
-		
-		
-	}
-*/	
-		
 
+/*checks to see if space if enemy's territory
+ *returns true if enemy's territory; false if not
+ */
+	protected boolean checkEnemyTerritory(int[] enemyCoords, Player currentPlayer){
+		int enemyX = enemyCoords[1];
+		int enemyY = enemyCoords[0];
+		
+		boolean blankSpace = game.getMap()[enemyX][enemyY].getOccupants().isEmpty();
+		
+			if(!blankSpace){
+				Player occupantOwner = game.getMap()[enemyX][enemyY].getOccupants().firstEntry().getOwner();
+				
+				if(!occupantOwner.equals(currentPlayer)){
+					return true;
+				}
+			}
+			
+		else {
+			return false;
+		}
+	}	
+	
+	protected boolean checkAdjacent(int[] playerCoords, int[] enemyCoords){
+		int enemyX = enemyCoords[1];
+		int enemyY = enemyCoords[0];
+		
+		int playerX = playerCoords[1];
+		int playerY = playerCoords[0];
+		
+		return Math.abs(enemyX-playerX)<= 1 && Math.abs(enemyY-playerY) <= 1;
+	}
+	
     //makes sure each player is representing a different country
     protected boolean seperateCountries(ArrayList<Player> players)
     {

@@ -256,6 +256,30 @@ public class RiskGame {
 	return idn;
  }
  
+ //checkWinner checks to see if currplayer owns all territories.
+ //**Maybe we should add a way to check if currplayer owns all home bases too? If we add that, then we should
+ //add another method to change ownership of homebase
+ 
+ public boolean checkWinner(Territory[][] maps, Player currplayer){
+ 	boolean winner = true;
+	
+ 	for(int i = 0; i < 9; i++)
+	{
+		for(int j = 0; i < 15; i++)
+		{
+			Unit occupiedUnits = maps[i][j].getOccupants();
+			if(occupiedUnits!=null){
+				Player owner = occupiedUnits.getOwner();
+				if(!owner.equals(currplayer)){
+					winner = false;
+				}
+			}
+		}
+	}
+	return winner;
+}
+				
+			
  
  
  

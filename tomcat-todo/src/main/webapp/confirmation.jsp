@@ -57,35 +57,37 @@ It's <span style="color<%=colorCode(currPlayer)%>"><%=currPlayer.getName()%>'s t
 </select>
 </form>
 
-
 <form action = "update" method="POST">
 <intput type="hidden" name ="operation" value = "UNITS" />
-<select name = "Units">
-	for(String key: occupants.keySet()) {%>
-	<option value = "<%=key%>"><%=key%></option>
+<%	Collection entries = occupants.values();
+	Iterator itr = entries.iterator();
+	while(itr.hasNext()) {
+	String option = itr.next().toString();%>
+	<input type="checkbox" name="unit" value="<%=option%>"><font size="2"><%=option%></font><br>
 <%} %>
-<input type="submit" value="Update"/>
 </select>
 </form>	
+<br>
 
 
 <form action = "update" method="POST">
 <input type="hidden" name = "operation" value = "ATTACK"/>
-<input type="text" name="Coord1"/>
-<input type="text" name="Coord2"/>
+<input type="text" name="Attack_Co1"/>
+<input type="text" name="Attack_Co2"/>
 
 <input type="submit" value="Attack!" />
 </form>
 
 <form action = "update" method="POST">
 <input type="hidden" name = "operation" value = "MOVE"/>
-<input type="text" name="Coord1"/>
-<input type="text" name="Coord2"/>
+<input type="text" name="Move_Co1"/>
+<input type="text" name="Move_Co2"/>
 
 <input type="submit" value="Move!" />
 </form>
 
 <br>
+
 
 [~]<% for(int a = 0; a < 14;a++){ %>[<%=a%>]<%}%>
 <br>

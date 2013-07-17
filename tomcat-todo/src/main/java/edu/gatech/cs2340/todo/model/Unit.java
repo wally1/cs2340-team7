@@ -32,6 +32,7 @@ public class Unit
 		moved = false;
 		
 	}
+	
 	public String getName()
 	{
 		return name;
@@ -116,9 +117,25 @@ public class Unit
 	}	
 	
 	public String toString()
-	{
-		return name+" with identification number "+getID()+" currently has "+health+" hit points, is located at "+occupying+
-				" and is owned by "+owner.getName()+"\nHas Moved:"+moved+" Has Attacked:"+attacked;
+	{	
+		String moveString = null;
+		String attackString = null;
+		
+		if (moved){
+			moveString = "Can't Move";
+		}
+		else {
+			moveString = "Can Move";
+		}
+		if (attacked){
+			attackString = "Can't Attack";
+		}
+		else {
+			attackString = "Can Attack";
+		}
+			
+		return name+" ID:"+getID()+" Health: "+health+" Located:"+occupying+
+				" Owner:"+owner.getName()+" | "+moveString+" | "+attackString+" |";
 	}
 	
 	
