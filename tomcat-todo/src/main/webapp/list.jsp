@@ -2,7 +2,10 @@
 <%@ page import="java.util.*" %>
 
 <% ArrayList<Player> players =
-   (ArrayList<Player>) request.getAttribute("players"); %>
+   (ArrayList<Player>) request.getAttribute("players"); 
+   %>
+ 
+
 
 <html>
 <head>

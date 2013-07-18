@@ -156,27 +156,76 @@ public class RiskGame {
      playerTurn = 0;
      return result;
  }
-// public void
- 
- 
- 
- 
- 
- 
+public void fight(ArrayList<Unit> attackers, ArrayList<Unit> defenders)
+{
+	Random rand = new Random();
+		int numAttackDice = (int) Math.floor(1+attackers.size()/4);
+		int numDefenseDice = (int) Math.floor(1+defenders.size()/4);
+				
+		int counterAttackDice = rand.nextInt(6)+1;
+		
+		System.out.println(attackers);
+		System.out.println(defenders);
+	
+		for(Unit attacker: attackers)
+		{
+
+			int damage = attacker.getStrength();
+			String diceRolls = "";
+			for(int a = 0; a<numAttackDice;a++)
+			{	
+				int roll = rand.nextInt(6)+1;
+				damage+=roll;
+				diceRolls+=roll+", ";
+			}
+			diceRolls = diceRolls.substring(0,diceRolls.length()-2);
+			Collections.shuffle(defenders);
+			
+			Unit victim = defenders.get(0);
+			if(victim != null)
+			{
+			System.out.println(attacker.getName() +"-"+attacker.getID()+"- is attacking "+victim.getName()+"-"+victim.getID());
+			System.out.println(attacker.getName() +"-"+attacker.getID()+"- rolled "+numAttackDice+" dice ("+diceRolls+") plus its strength ("+attacker.getStrength()+") for "+damage+" damage!");
+			int defense = victim.getDefense();
+			diceRolls = "";
+			for(int a = 0;a<numDefenseDice;a++)
+			{
+				int roll = rand.nextInt(6)+1;
+				defense+=roll;	
+				diceRolls +=roll+", ";
+			}
+			diceRolls=diceRolls.substring(0,diceRolls.length()-2);
+			System.out.println(victim.getName() +"-"+victim.getID()+"- rolled "+numDefenseDice+" dice ("+diceRolls+") plus its defense ("+victim.getDefense()+") to prevent "+defense+" damage!");
+			damage -= defense;
+			
+			if(damage < 0)
+				damage = 0;
+			victim.takeDamage(damage);
+			System.out.println(victim.getName() + "-"+victim.getID()+" was attacked for "+damage+" down to "+victim.getHealth()+"/"+victim.getMaxHealth()+"!");
+			
+			}
+	
+		}
+		for(Unit a: defenders)
+			a.update();
+		
+}
  
  public Territory[][] initializeBoard()
  {
  	map = new Territory[9][15];
- 	   for(int a = 0; a <9; a++){
- 			for(int b = 0; b < 15; b++)	{
- 					int[] coord = new int[2];
- 					coord[0] = a;
- 					coord[1] = b; 
- 					map[a][b] = new Territory("Territory ["+a+","+b+"]",coord); 
- 					
- 		 } 
- 		}
+ 	for(int a = 0; a <9; a++)
+ 	{
+ 		for(int b = 0; b < 15; b++)	
+ 		{
+ 			int[] coord = new int[2];
+ 			coord[0] = a;
+ 			coord[1] = b; 
+ 			map[a][b] = new Territory("Territory ["+a+","+b+"]",coord); 				
+ 		} 
+ 	}
  
+ 	//pretty sure we're just going to give everyone the same generic unit in the future
  	Unit ACUnit = new Unit("Alpha-Centaurian Space Frigate",5,3,1,null);
  	Unit PolarisUnit = new Unit("Polarian Manta",4,5,2,null);
  	Unit CharUnit = new Unit("Char Swarmling",3,2,0,null);
@@ -184,7 +233,7 @@ public class RiskGame {
  	Unit HALUnit = new Unit("HSS Probe",5,3,1,null);
  	Unit MidiUnit = new Unit("Midichlorian Force",6,4,1,null);
  	int armysize = (10-players.size()); 
- 	 ArrayList<String> countries = new ArrayList<String>(); 
+ 	ArrayList<String> countries = new ArrayList<String>(); 
  	for (Player player: players) { 
  		 countries.add(player.getCountry()); 
  		 if(player.getCountry().equals("Alpha-Centauri")){ACUnit.setOwner(player);}
@@ -205,7 +254,7 @@ public class RiskGame {
  		 if(countries.contains("Polaris")){
  			map[0][7].makeHomeBase(players.get(countries.indexOf("Polaris"))); 
  			int[] coords = {0,6,1,6,1,7,1,8,0,8};
- 		 	spawn(map, PolarisUnit,armysize,coords,id);  id+=coords.length/2*armysize;
+ 		 	id=spawn(map, PolarisUnit,armysize,coords,id);  
  		 }
  		 //upper right is Midichloria
  		 if(countries.contains("Midichloria")){

@@ -7,16 +7,17 @@ import java.util.*;
 public class Territory implements Comparable<Territory>
 {
 	
-	String name; //Name of territory, ie states/countries
-	int[] coordinates; //coordinate of Territory, chessboard style. length = 2, just 2 numbers. May be awkward if board is hexes and not squares
+	String name; 
+	int[] coordinates;
 	ArrayList<Resource> resources; //Resources this particular territory possesses, ie additional money to purchase troops, upgrades for troops, map information
-	boolean isOccupied; //true if there is a unit occupying the territory -> presence enough to occupy or need to spend turns capping?
+	boolean isOccupied; 
 	TreeMap<Integer,Unit> occupiedByUnit; //key is unit id, value is the unit
-	Player occupiedByPlayer; //the player who occupies this territory 
+	Player occupiedByPlayer; 
 	boolean occupiable;
 	boolean homeBase;
 
-public Territory(String name, int[] coords){
+	public Territory(String name, int[] coords)
+	{
 	
 	this.name=name;
 	coordinates = coords;
@@ -27,26 +28,25 @@ public Territory(String name, int[] coords){
 	occupiable = true;
 	homeBase = false;
 	}
-public int compareTo(Territory other){
-	if(coordinates[0] < other.getCoords()[0])
-		return -1;
-	else if(coordinates[0] > other.getCoords()[0])
-		return 1;
-	//if in same row
-	else if(coordinates[1] > other.getCoords()[1])
-		return 1;
-	else 
-		return -1;
+	public int compareTo(Territory other)
+	{
+		if(coordinates[0] < other.getCoords()[0])
+			return -1;
+		else if(coordinates[0] > other.getCoords()[0])
+			return 1;
+		//if in same row
+		else if(coordinates[1] > other.getCoords()[1])
+			return 1;
+		else 
+			return -1;
 
-}
-public boolean equals(Territory other){
-	if (Arrays.equals(coordinates,other.getCoords()))
-		return true;
-	return false;
-		
-}
-
-
+	}
+	public boolean equals(Territory other)
+	{
+		if (Arrays.equals(coordinates,other.getCoords()))
+			return true;
+		return false;
+	}
 	//if the territory is occupied by an asteroid
 	public void makeNotOccupiable(){
 	    occupiable = false;
@@ -54,6 +54,7 @@ public boolean equals(Territory other){
 	//the "home base" of the player. New units will spawn adjacent to the home base and if it is "conquered", that player loses.
 	public void makeHomeBase(Player player){
 	    homeBase = true;
+	    makeNotOccupiable();
 	    occupiedByPlayer = player;
 	    player.setHomeBase(coordinates[0],coordinates[1]);
     } 
@@ -61,7 +62,6 @@ public boolean equals(Territory other){
 	{
 		return homeBase;
 	}
-
 	public void addResource(Resource treasure)
 	{
 		resources.add(treasure);
@@ -81,22 +81,22 @@ public boolean equals(Territory other){
 	{
 		if(occupiable)// not an asteroid
 		{
-			//if territory is already occupied by another player, then fight
-/*			if(isOccupied && !occupiedByPlayer.equals(conquerer.getOwner())) 
+			//if territory is already occupied by another player, then nothing happens
+			if(isOccupied && !occupiedByPlayer.equals(conquerer.getOwner())) 
 			{
-				//fight
+				System.out.println("You can't move there, something's in the way!");
 			}
 			else
-			{*/
+			{
 				isOccupied = true;
 				occupiedByUnit.put(conquerer.getID(),conquerer);
 				occupiedByPlayer = conquerer.getOwner();
-	//		}
+			}
 		}
 		else
 			System.out.println("There's something in the way!");
 		
-		update();
+		
 	}
 	public String getName(){
 		return name;
@@ -104,7 +104,6 @@ public boolean equals(Territory other){
 	public int[] getCoords(){
 		return coordinates;
 	}
-
 	public Boolean isOccupied()
 	{
 		return isOccupied;
@@ -118,37 +117,33 @@ public boolean equals(Territory other){
 		return occupiedByPlayer;
 	}
 	
-	//removes units that no longer occupy this space
-	//can probably implement much more elegantly with an iterator
-	public void update()
+
+	public void update(Unit unit)
 	{
-		//if unit is dead
-//    	ArrayList<Integer> toBeRemoved = new ArrayList<Integer>();
-//    	for(int id: occupiedByUnit.keySet())
-//    	{
-//    		if(occupiedByUnit.get(id).getHealth() <= 0)
-//    		{
-//    			toBeRemoved.add(id);
-//    		}
-//    	}
-//    	for(int id: toBeRemoved)
-//    	{
-//    		occupiedByUnit.remove(id);
-//    	}
-//    	toBeRemoved = new ArrayList<Integer>();
-//		for(int id: occupiedByUnit.keySet())
-//		{
-//			if(!Arrays.equals(this.getCoords(), occupiedByUnit.get(id).getTerritory().getCoords()))
-//			{
-//				toBeRemoved.add(id);
-//			}
-//		}
-//		for(int a: toBeRemoved)
-//			occupiedByUnit.remove(a);
-//		
-//		if(occupiedByUnit.size() == 0)
-//			occupiedByPlayer = null;
+    	if(!equals(unit.getTerritory().getCoords()) || unit.getHealth() < 0)
+    		occupiedByUnit.remove(unit.getID());
+    	if(occupiedByUnit.size() == 0)
+    		isOccupied = false;
+
 	}
+	 public void removeDeadUnits()
+	    {
+	 //   	ArrayList<Integer> toBeRemoved = new ArrayList<Integer>();
+/*	    	for(int id: army.keySet())
+	    	{
+	    		if(army.get(id).getHealth() <= 0)
+	    		{
+	    			int currentUnitAmount = occupiedTerritories.get(army.get(id).getTerritory().getName());
+	    	    	occupiedTerritories.put(army.get(id).getTerritory().getName(),currentUnitAmount-1);
+	    	    	toBeRemoved.add(id);
+	    	    	System.out.println("Removed!");
+	    		}
+	    	}
+	    	for(int id: toBeRemoved)
+	    	{
+	    		army.remove(id);
+	    	}*/
+	    }
 	public String toString()
 	{
 		return name;

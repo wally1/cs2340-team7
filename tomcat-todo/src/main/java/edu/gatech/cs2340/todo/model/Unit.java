@@ -1,27 +1,46 @@
 package edu.gatech.cs2340.todo.model;
 
+
+
 import java.util.*;
 
 public class Unit
 {
-	String name; //name of unit ie Infantry, Artillery, Cavalry, Frigate, Destroyer, Carrier, etc.
-	int id; //unique identifier per unit
-	int health; //amount of damage Unit can take before destroyed
-	int strength; //amount of damage Unit can deal -> number of dice?
-	int defense; //lowers amount of damage Unit takes -> number of dice?
+	String name;
+	int id; 
+	int health;
+	int maxHealth;
+	int strength; //amount of damage Unit can deal 
+	int defense; //lowers amount of damage Unit takes 
 //	ArrayList<Resource> inventory; //inventory of unit ie speed boost, attack boost, etc.
-	Player owner; //who owns this Unit
+	Player owner; 
 	Territory previouslyOccupied;
 	Territory occupying;
 	Random rand = new Random();
 	boolean attacked;
 	boolean moved;
 	
+	public  Unit(String name, int health, int strength, int defense)
+	{
+		this.name = name;
+		id = 0;
+		this.health = maxHealth = health;
+		this.strength=strength;
+		this.defense = defense;
+	//	inventory = new ArrayList<Resource>();
+		owner = null;
+		previouslyOccupied = null;
+		occupying = null;
+		attacked = false;
+		moved = false;
+		
+		
+	}
 	public  Unit(String name, int health, int strength, int defense, Player owner)
 	{
 		this.name = name;
 		id = 0;
-		this.health = health;
+		this.health = maxHealth = health;
 		this.strength=strength;
 		this.defense = defense;
 	//	inventory = new ArrayList<Resource>();
@@ -41,9 +60,18 @@ public class Unit
 	{
 		health-=a;
 	}
+	public void update()
+	{
+		owner.update(this);
+		occupying.update(this);
+	}
 	public int getHealth()
 	{
 		return health;
+	}
+	public int getMaxHealth()
+	{
+		return maxHealth;
 	}
 	public int getStrength()
 	{
@@ -69,14 +97,22 @@ public class Unit
 	{
 		return owner;
 	}
-	//essentially the "move" method
-	//if unit stays in place, must "move" to the same location
+	//setTerritory and move methods separated to smooth over Player.update()
 	public void setTerritory(Territory location)
 	{
 		previouslyOccupied = occupying;
 		occupying = location;
-		moved = true;
+
 	}
+	public void move(Territory location)
+	{
+		setTerritory(location);
+		owner.update(this);
+		moved = true;
+		previouslyOccupied.update(this);
+		occupying.addUnit(this);
+	}
+
 	public Territory getTerritory()
 	{
 		return occupying;
@@ -85,29 +121,10 @@ public class Unit
 	{
 		return previouslyOccupied;
 	}
-	//this unit attacks the parameter unit, will probably involve a "dice roll" (RNG 1-6) multiplied by the attacker's attack minus 
-	//the defender's defense multiplied by a dice roll. More or less die rolls may depends on the specific attack/defense modifier
-	//the result will be subtracted from the defender's hp
-	public int[] attack(Unit enemy)
+	public void setAttacked()
 	{
-//currently only 1 die roll per modifier. Maybe more alongside future implmentations ie. flanking attack bonus/certain items, etc.
-		int attackDice = rand.nextInt(6)+1;
-		int enemyDefenseDice = rand.nextInt(6)+1;
-		int enemyAttackDice = rand.nextInt(6)+1;
-		int defenseDice = rand.nextInt(6)+1;
-		int counterAttackDice = rand.nextInt(6)+1;
-		int damage = attackDice*strength-enemyDefenseDice*enemy.getDefense();
-		enemy.takeDamage(damage);
-		int enemyDamage = enemyAttackDice*enemy.getStrength()-defenseDice*defense;
-		enemyDamage = counterAttackDice/6*enemyDamage; //counterattack damage reduced by a factor of die roll
-		takeDamage(enemyDamage);
 		attacked = true;
-	
-		int[] dice = {attackDice,enemyDefenseDice,enemyAttackDice,defenseDice,counterAttackDice,damage,enemyDamage};
-		return dice;
 	}
-
-
 	public boolean getAttacked(){
 		return attacked;
 	}
@@ -115,8 +132,12 @@ public class Unit
 	public boolean getMoved(){
 		return moved;
 	}	
-	
+	public void resetForTurn()
+	{
+		attacked = moved = false;
+	}
 	public String toString()
+<<<<<<< HEAD
 	{	
 		String moveString = null;
 		String attackString = null;
@@ -136,16 +157,19 @@ public class Unit
 			
 		return name+" ID:"+getID()+" Health: "+health+" Located:"+occupying+
 				" Owner:"+owner.getName()+" | "+moveString+" | "+attackString+" |";
+=======
+	{
+		return name+"-"+getID()+" has "+health+"/"+maxHealth+" health, is at "+occupying+
+				"     has moved - "+moved+"     has attacked - "+attacked;
+
+>>>>>>> a6d3338974276d8d43902d66fbee4662e2769504
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 }
+	
+	
+	
+	
+	
+	
+	

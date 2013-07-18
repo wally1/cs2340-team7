@@ -1,0 +1,27 @@
+<html>
+
+<head>
+<link rel="stylesheet" type="text/css" href="stylesheet.css">
+<title> Space Risk </title>
+
+<script>
+function loadImage()
+{
+//document.getElementByID("0,0")
+load.pic('src="orange_station.png"');
+}
+</script>
+
+</head>
+
+<body>
+<img class="map" src="space_map_grid_only.png" alt="Space Risk Map" usemap="#game_map">
+
+<map name="game_map">
+<area id="0,0" shape="rect" coords="0,0,75,75" alt="0,0"
+onclick="return loadImage()"
+>
+</map>
+
+</body>
+</html>
