@@ -54,6 +54,7 @@ public class Territory implements Comparable<Territory>
 	//the "home base" of the player. New units will spawn adjacent to the home base and if it is "conquered", that player loses.
 	public void makeHomeBase(Player player){
 	    homeBase = true;
+	    makeNotOccupiable();
 	    occupiedByPlayer = player;
 	    player.setHomeBase(coordinates[0],coordinates[1]);
     } 
@@ -95,7 +96,7 @@ public class Territory implements Comparable<Territory>
 		else
 			System.out.println("There's something in the way!");
 		
-		update();
+		
 	}
 	public String getName(){
 		return name;
@@ -116,37 +117,33 @@ public class Territory implements Comparable<Territory>
 		return occupiedByPlayer;
 	}
 	
-	//removes units that no longer occupy this space
-	//can probably implement much more elegantly with an iterator
-	public void update()
+
+	public void update(Unit unit)
 	{
-		//if unit is dead
-//    	ArrayList<Integer> toBeRemoved = new ArrayList<Integer>();
-//    	for(int id: occupiedByUnit.keySet())
-//    	{
-//    		if(occupiedByUnit.get(id).getHealth() <= 0)
-//    		{
-//    			toBeRemoved.add(id);
-//    		}
-//    	}
-//    	for(int id: toBeRemoved)
-//    	{
-//    		occupiedByUnit.remove(id);
-//    	}
-//    	toBeRemoved = new ArrayList<Integer>();
-//		for(int id: occupiedByUnit.keySet())
-//		{
-//			if(!Arrays.equals(this.getCoords(), occupiedByUnit.get(id).getTerritory().getCoords()))
-//			{
-//				toBeRemoved.add(id);
-//			}
-//		}
-//		for(int a: toBeRemoved)
-//			occupiedByUnit.remove(a);
-//		
-//		if(occupiedByUnit.size() == 0)
-//			occupiedByPlayer = null;
+    	if(!equals(unit.getTerritory().getCoords()) || unit.getHealth() < 0)
+    		occupiedByUnit.remove(unit.getID());
+    	if(occupiedByUnit.size() == 0)
+    		isOccupied = false;
+
 	}
+	 public void removeDeadUnits()
+	    {
+	 //   	ArrayList<Integer> toBeRemoved = new ArrayList<Integer>();
+/*	    	for(int id: army.keySet())
+	    	{
+	    		if(army.get(id).getHealth() <= 0)
+	    		{
+	    			int currentUnitAmount = occupiedTerritories.get(army.get(id).getTerritory().getName());
+	    	    	occupiedTerritories.put(army.get(id).getTerritory().getName(),currentUnitAmount-1);
+	    	    	toBeRemoved.add(id);
+	    	    	System.out.println("Removed!");
+	    		}
+	    	}
+	    	for(int id: toBeRemoved)
+	    	{
+	    		army.remove(id);
+	    	}*/
+	    }
 	public String toString()
 	{
 		return name;

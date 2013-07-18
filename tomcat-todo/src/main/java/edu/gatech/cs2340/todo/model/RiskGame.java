@@ -158,36 +158,57 @@ public class RiskGame {
  }
 public void fight(ArrayList<Unit> attackers, ArrayList<Unit> defenders)
 {
-	int numAttackDice = Math.floor(1+attackers.size()/4);
-	int numDefenseDice = Math.floor(1+defenders.size()/4);
-			
-	int counterAttackDice = rand.nextInt(6)+1;
+	Random rand = new Random();
+		int numAttackDice = (int) Math.floor(1+attackers.size()/4);
+		int numDefenseDice = (int) Math.floor(1+defenders.size()/4);
+				
+		int counterAttackDice = rand.nextInt(6)+1;
+		
+		System.out.println(attackers);
+		System.out.println(defenders);
 	
-	for(Unit attacker: attackers)
-	{
+		for(Unit attacker: attackers)
+		{
 
-		int damage = attacker.getStrength();
-		String diceRolls = "";
-		for(int a = 0; a<numAttackDice;a++)
-		{	
-			damage+=rand.nextInt(6)+1;
-			diceRolls+=damage+" ";
+			int damage = attacker.getStrength();
+			String diceRolls = "";
+			for(int a = 0; a<numAttackDice;a++)
+			{	
+				int roll = rand.nextInt(6)+1;
+				damage+=roll;
+				diceRolls+=roll+", ";
+			}
+			diceRolls = diceRolls.substring(0,diceRolls.length()-2);
+			Collections.shuffle(defenders);
+			
+			Unit victim = defenders.get(0);
+			if(victim != null)
+			{
+			System.out.println(attacker.getName() +"-"+attacker.getID()+"- is attacking "+victim.getName()+"-"+victim.getID());
+			System.out.println(attacker.getName() +"-"+attacker.getID()+"- rolled "+numAttackDice+" dice ("+diceRolls+") plus its strength ("+attacker.getStrength()+") for "+damage+" damage!");
+			int defense = victim.getDefense();
+			diceRolls = "";
+			for(int a = 0;a<numDefenseDice;a++)
+			{
+				int roll = rand.nextInt(6)+1;
+				defense+=roll;	
+				diceRolls +=roll+", ";
+			}
+			diceRolls=diceRolls.substring(0,diceRolls.length()-2);
+			System.out.println(victim.getName() +"-"+victim.getID()+"- rolled "+numDefenseDice+" dice ("+diceRolls+") plus its defense ("+victim.getDefense()+") to prevent "+defense+" damage!");
+			damage -= defense;
+			
+			if(damage < 0)
+				damage = 0;
+			victim.takeDamage(damage);
+			System.out.println(victim.getName() + "-"+victim.getID()+" was attacked for "+damage+" down to "+victim.getHealth()+"/"+victim.getMaxHealth()+"!");
+			
+			}
+	
 		}
+		for(Unit a: defenders)
+			a.update();
 		
-		Collections.shuffle(defenders);
-		Unit victim = defenders.get(0);
-		System.out.println(attacker.getName() +"-"+attacker.getID()+" - is attacking "+victim.getName());
-		System.out.println(attacker.getName() +"-"+attacker.getID()+" - rolled "+diceRolls+" for damage!");
-		int defense = victim.getDefense();
-		for(int a = 0;a<numDefensedice;a++)
-			defense+=rand.nextInt(6)+1;
-		damage -= defense;
-		
-		victim.takeDamage(damage);
-		System.out.println(victim + " was attacked for "+damage" down to "+victim.getHealth()+"/"+victim.getMaxHealth());
-	}
-	
-	
 }
  
  public Territory[][] initializeBoard()

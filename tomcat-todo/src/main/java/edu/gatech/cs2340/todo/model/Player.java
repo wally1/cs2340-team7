@@ -27,6 +27,23 @@ public class Player implements Comparable<Player>
         occupiedTerritories= new TreeMap<String,Integer>();
         hasLost = false;
         homebase = new int[2];
+        color = determineColor(country);
+    }
+    private String determineColor(String task)
+    {
+    	if (country.equals("Polaris")) { return "purple";}
+    	else if (country.equals("Alpha-Centauri")) { return "green";}
+    	else if (country.equals("Char")) { return "red";} 
+    	else if (country.equals("Midichloria")) { return "blue";}
+    	else if (country.equals("Borg")) { return "gray";} 
+    	else if (country.equals("HAL Space Station")) { return "orange";}
+    	else
+    		return "pink";
+    	
+    }
+    public String getColor()
+    {
+    	return color;
     }
     public int compareTo(Player other){
     	if(turn < other.getTurn())
@@ -113,6 +130,7 @@ public class Player implements Comparable<Player>
     			int currentUnitAmount = occupiedTerritories.get(army.get(id).getTerritory().getName());
     	    	occupiedTerritories.put(army.get(id).getTerritory().getName(),currentUnitAmount-1);
     	    	toBeRemoved.add(id);
+    	    	System.out.println("Removed!");
     		}
     	}
     	for(int id: toBeRemoved)
@@ -158,6 +176,13 @@ public class Player implements Comparable<Player>
     	hasLost = true;
     	army = new TreeMap<Integer,Unit>();
     	occupiedTerritories = new TreeMap<String,Integer>();
+    }
+    public void resetArmy()
+    {
+    	for(int id:army.keySet())
+    	{
+    		army.get(id).resetForTurn();
+    	}
     }
     public String toString() {	
     	return name +" from "+country+" has an army with " +army.size()+" units in it and goes on turn "+turn+"\n\n";

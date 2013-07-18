@@ -31,6 +31,9 @@ public class Unit
 		owner = null;
 		previouslyOccupied = null;
 		occupying = null;
+		attacked = false;
+		moved = false;
+		
 		
 	}
 	public  Unit(String name, int health, int strength, int defense, Player owner)
@@ -55,6 +58,11 @@ public class Unit
 	public void takeDamage(int a)
 	{
 		health-=a;
+	}
+	public void update()
+	{
+		owner.update(this);
+		occupying.update(this);
 	}
 	public int getHealth()
 	{
@@ -93,13 +101,17 @@ public class Unit
 	{
 		previouslyOccupied = occupying;
 		occupying = location;
-		moved = true;
+
 	}
-	public void move(Territory newLocation)
+	public void move(Territory location)
 	{
-		setTerritory(newLocation);
+		setTerritory(location);
 		owner.update(this);
+		moved = true;
+		previouslyOccupied.update(this);
+		occupying.addUnit(this);
 	}
+
 	public Territory getTerritory()
 	{
 		return occupying;
@@ -108,7 +120,10 @@ public class Unit
 	{
 		return previouslyOccupied;
 	}
-
+	public void setAttacked()
+	{
+		attacked = true;
+	}
 	public boolean getAttacked(){
 		return attacked;
 	}
@@ -116,11 +131,14 @@ public class Unit
 	public boolean getMoved(){
 		return moved;
 	}	
-	
+	public void resetForTurn()
+	{
+		attacked = moved = false;
+	}
 	public String toString()
 	{
-		return name+" with identification number "+getID()+" currently has "+health+" hit points, is located at "+occupying+
-				" and is owned by "+owner.getName()+"\nHas Moved:"+moved+" Has Attacked:"+attacked;
+		return name+"-"+getID()+" has "+health+"/"+maxHealth+" health, is at "+occupying+
+				"     has moved - "+moved+"     has attacked - "+attacked;
 
 	}
 

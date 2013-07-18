@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletResponse;
     })
 public class TodoServlet extends HttpServlet {
 
-	//List of RiskGames so you can new/load game?
  	RiskGame game = new RiskGame(1);
     ArrayList<Player> players = game.getPlayers();
 
@@ -41,83 +40,257 @@ public class TodoServlet extends HttpServlet {
         String operation = (String) request.getParameter("operation");
         System.out.println(operation);
         System.out.println("It is turn "+game.getCurrTurn());
+
+		
+		  
+	
+				
 		  
         // If form didn't contain an operation field and
         // we're in doPost(), the operation is POST
      
         //probably more elegant fix later, like just changing operation to "Confirmation"
-        if (null == operation)
-        {
-        	operation = "CONFIRMATION";
-        }
+        if (null == operation){operation = "CONFIRMATION";}
     
         
-        if (operation.equalsIgnoreCase("PUT")) 
-        {
+        if (operation.equalsIgnoreCase("PUT")) {
             System.out.println("Delegating to doPut().");
             doPut(request, response);
         } 
-        else if (operation.equalsIgnoreCase("DELETE")) 
-        {
+        else if (operation.equalsIgnoreCase("DELETE")) {
             System.out.println("Delegating to doDelete().");
             doDelete(request, response);
         }
-        else if(operation.equalsIgnoreCase("SPAWN")) 
+        else if(operation.equalsIgnoreCase("TURN"))
         {
-        	System.out.println("We're SPAWNING more units!");
-           	int a = Integer.parseInt(request.getParameter("Coord1"));
-           	int b = Integer.parseInt(request.getParameter("Coord2"));
-           	Player currplayer = game.getPlayers().get(game.getCurrTurn());
-           	request.setAttribute("currplayer",currplayer);
-           	Unit unit = new Unit("Space Frigate",40,6,0,currplayer); //probably need to give all races same unit, or ugly fix later
-           	int[] co = {a,b};
-           	Territory[][] newMap = game.getMap();
-           	players = game.getPlayers();
-           	request.setAttribute("players",players);
-           	request.setAttribute("map",newMap);
-           	
-           	if(check(co,currplayer))
-           	{
-           	game.spawn(game.getMap(),unit, 1, co, game.getID());
-           	game.nextTurn();
-           	System.out.println("It is now turn "+game.getCurrTurn());
-           	newMap = game.getMap();
-           	request.setAttribute("map",newMap);
-           	currplayer = game.getPlayers().get(game.getCurrTurn());
-           	request.setAttribute("currplayer",currplayer);
-           	
-           	RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/confirmation.jsp");
-            dispatcher.forward(request,response);
-            }
-            else
-            {
-            	System.out.println("You can't spawn there!");
-               	RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/confirmation.jsp");
-                dispatcher.forward(request,response); 	
-            }
-        }
-			else if(operation.equalsIgnoreCase("TERRITORY")){
-				System.out.println("Displaying Units");
-				String territory = request.getParameter("Players");
-				String subA = territory.substring(territory.length()-4, territory.length()-3);
-				String subB = territory.substring(territory.length()-2, territory.length()-1);
+        	System.out.println("We're going to the next turn!");
+        	game.nextTurn();
+        	System.out.println("It is now turn "+game.getCurrTurn());
+        	Player currplayer = game.getPlayers().get(game.getCurrTurn());
+        	request.setAttribute("currplayer",currplayer);
+        	Territory[][] newMap = game.getMap();
+        	players = game.getPlayers();
+        	request.setAttribute("players",players);
+        	request.setAttribute("map",newMap);
+        	Unit unit = new Unit("Space Frigate",40,6,0,currplayer);
+        	TreeMap<String,Integer> terr = currplayer.getOccupiedTerritories();
+			String territory = terr.firstKey();
+			request.setAttribute("selectedTerritory",territory);
+				int index = territory.indexOf('[');
+				int index2 = territory.indexOf(']');
+				int indexC = territory.indexOf(',');
+				String subA = territory.substring(index+1,indexC);
+				String subB = territory.substring(indexC+1,index2);
 				int coA = Integer.parseInt(subA);
 				int coB = Integer.parseInt(subB);
 				TreeMap<Integer,Unit> occupants = game.getMap()[coA][coB].getOccupants();
-				
-								
-				Territory[][] newMap = game.getMap();
-				Player currplayer = game.getPlayers().get(game.getCurrTurn());
+				request.setAttribute("occupants",occupants);
+			
+    		RequestDispatcher dispatcher = 
+                    getServletContext().getRequestDispatcher("/confirmation.jsp");
+                    dispatcher.forward(request,response);
+        	
+        }
+        else if(operation.equalsIgnoreCase("SPAWN")) {
+        	System.out.println("We're SPAWNING more units!");
+            	int a = Integer.parseInt(request.getParameter("Coord1"));
+            	int b = Integer.parseInt(request.getParameter("Coord2"));
+            	Player currplayer = game.getPlayers().get(game.getCurrTurn());
             	request.setAttribute("currplayer",currplayer);
+            	Territory[][] newMap = game.getMap();
             	players = game.getPlayers();
             	request.setAttribute("players",players);
+            	request.setAttribute("map",newMap);
+            	Unit unit = new Unit("Space Frigate",40,6,0,currplayer);
+            	TreeMap<String,Integer> terr = currplayer.getOccupiedTerritories();
+    			String territory = terr.firstKey();
+				request.setAttribute("selectedTerritory",territory);
+    				int index = territory.indexOf('[');
+    				int index2 = territory.indexOf(']');
+    				int indexC = territory.indexOf(',');
+    				String subA = territory.substring(index+1,indexC);
+    				String subB = territory.substring(indexC+1,index2);
+    				int coA = Integer.parseInt(subA);
+    				int coB = Integer.parseInt(subB);
+    				TreeMap<Integer,Unit> occupants = game.getMap()[coA][coB].getOccupants();
+    				request.setAttribute("occupants",occupants);
+            	int[] co = {a,b};
+            	
+            	if(check(co,currplayer))
+            	{
+            		game.spawn(game.getMap(),unit, 1, co, game.getID());
+/*            		game.nextTurn();
+            		System.out.println("It is now turn "+game.getCurrTurn());*/
+            		newMap = game.getMap();
+            		players = game.getPlayers();
+            		request.setAttribute("players",players);
+            		request.setAttribute("map",newMap);
+            		currplayer = game.getPlayers().get(game.getCurrTurn());
+            		request.setAttribute("currplayer",currplayer);
+            	
+            		RequestDispatcher dispatcher = 
+                        getServletContext().getRequestDispatcher("/command.jsp");
+                        dispatcher.forward(request,response);
+            	}
+            	else
+            	{
+            		System.out.println("You can't spawn there!");
+
+            		RequestDispatcher dispatcher = 
+                            getServletContext().getRequestDispatcher("/confirmation.jsp");
+                            dispatcher.forward(request,response);
+                	
+            	}
+            	
+            } 
+        else if(operation.equalsIgnoreCase("MOVE"))
+        {
+        	//grabs checked units
+        	//need to make method that passes all values
+        	Player currplayer = game.getPlayers().get(game.getCurrTurn());
+           	request.setAttribute("currplayer",currplayer);
+        	Territory[][] newMap = game.getMap();
+        	players = game.getPlayers();
+        	request.setAttribute("players",players);
+        	request.setAttribute("map",newMap);
+        	Unit unit = new Unit("Space Frigate",40,6,0,currplayer);
+        	TreeMap<String,Integer> terr = currplayer.getOccupiedTerritories();
+			String territory = terr.firstKey();
+			request.setAttribute("selectedTerritory",territory);
+				int index = territory.indexOf('[');
+				int index2 = territory.indexOf(']');
+				int indexC = territory.indexOf(',');
+				String subA = territory.substring(index+1,indexC);
+				String subB = territory.substring(indexC+1,index2);
+				int coA = Integer.parseInt(subA);
+				int coB = Integer.parseInt(subB);
+				TreeMap<Integer,Unit> occupants = game.getMap()[coA][coB].getOccupants();
+				request.setAttribute("occupants",occupants);
+        	
+        	String[] selectedUnitIDS = request.getParameterValues("unit");
+
+        	ArrayList<Unit> selectedUnits = new ArrayList<Unit>();
+        	
+        	for(String ids: selectedUnitIDS)
+        		selectedUnits.add(currplayer.getArmy().get(Integer.parseInt(ids)));
+        	
+           	int[] startCo = selectedUnits.get(0).getTerritory().getCoords();
+        	int x = Integer.parseInt(request.getParameter("MoveCoordX"));
+        	int y = Integer.parseInt(request.getParameter("MoveCoordY"));
+        	int[] moveCo = {y,x};
+
+        	Territory location = game.getMap()[moveCo[0]][moveCo[1]];
+        	System.out.println("About to move!");
+        	
+        	
+        	if(checkAdjacent(startCo,moveCo))
+        	{
+        		System.out.println("We're moving!");
+        		for(Unit a: selectedUnits)
+        		{
+        			if(!a.getMoved())
+        			a.move(location);
+        		}
+        	}
+        	else
+        		System.out.println("You can't move there!");
+        	
+       		RequestDispatcher dispatcher = 
+                    getServletContext().getRequestDispatcher("/command.jsp");
+                    dispatcher.forward(request,response);
+        }
+        else if(operation.equalsIgnoreCase("ATTACK"))
+        {
+        	Player currplayer = game.getPlayers().get(game.getCurrTurn());
+           	request.setAttribute("currplayer",currplayer);
+        	Territory[][] newMap = game.getMap();
+        	players = game.getPlayers();
+        	request.setAttribute("players",players);
+        	request.setAttribute("map",newMap);
+        	Unit unit = new Unit("Space Frigate",40,6,0,currplayer);
+        	TreeMap<String,Integer> terr = currplayer.getOccupiedTerritories();
+			String territory = terr.firstKey();
+			request.setAttribute("selectedTerritory",territory);
+				int index = territory.indexOf('[');
+				int index2 = territory.indexOf(']');
+				int indexC = territory.indexOf(',');
+				String subA = territory.substring(index+1,indexC);
+				String subB = territory.substring(indexC+1,index2);
+				int coA = Integer.parseInt(subA);
+				int coB = Integer.parseInt(subB);
+				TreeMap<Integer,Unit> occupants = game.getMap()[coA][coB].getOccupants();
+				request.setAttribute("occupants",occupants);
+				
+        	//grabs checked Units
+	        	
+	        	String[] selectedUnitIDS = request.getParameterValues("unit");
+
+	        	ArrayList<Unit> selectedUnits = new ArrayList<Unit>();
+	        	
+	        	for(String ids: selectedUnitIDS)
+	        		selectedUnits.add(currplayer.getArmy().get(Integer.parseInt(ids)));
+	        	
+	           	int[] startCo = selectedUnits.get(0).getTerritory().getCoords();
+	        	int x = Integer.parseInt(request.getParameter("AttackCoordX"));
+	        	int y = Integer.parseInt(request.getParameter("AttackCoordY"));
+	        	int[] moveCo = {y,x};
+
+	        	Territory location = game.getMap()[moveCo[0]][moveCo[1]];
+	        	System.out.println("About to move!");
+	        	
+	        	ArrayList<Unit> victims = new ArrayList<Unit>();
+	        	for(int ids: location.getOccupants().keySet())
+	        		victims.add(location.getOccupants().get(ids));
+	        	
+	        	boolean attackSucceed = true;
+	        	
+	        	if(checkAdjacent(startCo,moveCo))
+	        	{
+	        		System.out.println("We're attacking!");
+	        		for(Unit a: selectedUnits)
+	        		{
+	        			if(a.getAttacked())
+	        				attackSucceed = false;
+	        		}
+	        		
+	        		if(attackSucceed)
+	        			game.fight(selectedUnits, victims);
+	        		else
+	        			System.out.println("Some of the selected units can't attack!");
+	        	}
+	        	else
+	        		System.out.println("You can't attack there!");
+	        	
+	       		RequestDispatcher dispatcher = 
+	                    getServletContext().getRequestDispatcher("/command.jsp");
+	                    dispatcher.forward(request,response);
+        }
+
+		else if(operation.equalsIgnoreCase("TERRITORY")){
+			System.out.println("Displaying Units");
+			String territory = request.getParameter("Players");
+			request.setAttribute("selectedTerritory",territory);
+			int index = territory.indexOf('[');
+			int index2 = territory.indexOf(']');
+			int indexC = territory.indexOf(',');
+			String subA = territory.substring(index+1,indexC);
+			String subB = territory.substring(indexC+1,index2);
+			int coA = Integer.parseInt(subA);
+			int coB = Integer.parseInt(subB);
+			TreeMap<Integer,Unit> occupants = game.getMap()[coA][coB].getOccupants();
+										
+			Territory[][] newMap = game.getMap();
+			Player currplayer = game.getPlayers().get(game.getCurrTurn());
+           	request.setAttribute("currplayer",currplayer);
+           	players = game.getPlayers();
+           	request.setAttribute("players",players);
             	request.setAttribute("map",newMap);
 					request.setAttribute("occupants",occupants);
             	currplayer = game.getPlayers().get(game.getCurrTurn());
             	request.setAttribute("currplayer",currplayer);
             	
             	RequestDispatcher dispatcher = 
-                        getServletContext().getRequestDispatcher("/confirmation.jsp");
+                        getServletContext().getRequestDispatcher("/command.jsp");
                         dispatcher.forward(request,response);
 			}
 				
@@ -147,9 +320,8 @@ public class TodoServlet extends HttpServlet {
 							
 		*/			
 					
-
         else if (operation.equalsIgnoreCase("CONFIRMATION")) {
-        	
+        		
         	if(players.size() > 2 && players.size() < 7 && seperateCountries(players))
         	{
         	
@@ -161,6 +333,19 @@ public class TodoServlet extends HttpServlet {
         	Player currplayer = game.getPlayers().get(game.getCurrTurn());
         	request.setAttribute("currplayer",currplayer);
         	request.setAttribute("map",game.getMap());
+			
+			TreeMap<String,Integer> terr = currplayer.getOccupiedTerritories();
+			String territory = terr.firstKey();
+				int index = territory.indexOf('[');
+				int index2 = territory.indexOf(']');
+				int indexC = territory.indexOf(',');
+				String subA = territory.substring(index+1,indexC);
+				String subB = territory.substring(indexC+1,index2);
+				int coA = Integer.parseInt(subA);
+				int coB = Integer.parseInt(subB);
+				TreeMap<Integer,Unit> occupants = game.getMap()[coA][coB].getOccupants();
+				request.setAttribute("occupants",occupants);
+			
         	System.out.println("We're starting the game! It's turn "+game.getCurrTurn());
             RequestDispatcher dispatcher = 
             getServletContext().getRequestDispatcher("/confirmation.jsp");
@@ -213,7 +398,7 @@ public class TodoServlet extends HttpServlet {
     	
     }
 
-/*	protected boolean checkAdjacent(int[] homeCo; int[] adjacentCo){
+	protected boolean checkAdjacent(int[] homeCo, int[] adjacentCo){
 		int homeX = homeCo[1];
 		int homeY = homeCo[0];
 		
@@ -223,13 +408,14 @@ public class TodoServlet extends HttpServlet {
 		return Math.abs(homeX-adjX) <= 1 && Math.abs(homeY-adjY) <=1;
 		
 		
+	
+
 	}
-*/	
 		
 
     //makes sure each player is representing a different country
-    //redundant with RiskGame
-    protected boolean seperateCountries(ArrayList<Player> players)
+	//I think this is redundant with addPlayer in RiskGame
+    private boolean seperateCountries(ArrayList<Player> players)
     {
      System.out.println("The size of the array "+players.size());
      boolean go = true;
@@ -257,7 +443,8 @@ public class TodoServlet extends HttpServlet {
      */
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response)
-            throws IOException, ServletException {
+            throws IOException, ServletException 
+    {
         System.out.println("In doGet()");
 //        players = new ArrayList<Player>();
    //     System.out.println("Starting a new game, erasing the player ArrayList");
@@ -272,7 +459,7 @@ public class TodoServlet extends HttpServlet {
     protected void doPut(HttpServletRequest request,
                          HttpServletResponse response)
             throws IOException, ServletException     
-         {
+    {
 
         System.out.println("In doPut()");
         String title = (String) request.getParameter("Name");
@@ -290,13 +477,14 @@ public class TodoServlet extends HttpServlet {
         RequestDispatcher dispatcher = 
             getServletContext().getRequestDispatcher("/list.jsp");
         dispatcher.forward(request,response);
-    	}
+    }
 
-         
+   
 
     protected void doDelete(HttpServletRequest request,
                             HttpServletResponse response)
-            throws IOException, ServletException {
+            throws IOException, ServletException 
+    {
         System.out.println("In doDelete()");
         int id = getId(request);
         game.removePlayer(id);
@@ -307,7 +495,8 @@ public class TodoServlet extends HttpServlet {
         dispatcher.forward(request,response);
     }
 
-    private int getId(HttpServletRequest request) {
+    private int getId(HttpServletRequest request) 
+    {
         String uri = request.getPathInfo();
         // Strip off the leading slash, e.g. "/2" becomes "2"
         String idStr = uri.substring(1, uri.length()); 
