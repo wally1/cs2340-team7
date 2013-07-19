@@ -238,6 +238,12 @@ public class TodoServlet extends HttpServlet {
 	        	Territory location = game.getMap()[moveCo[0]][moveCo[1]];
 	        	System.out.println("About to move!");
 	        	
+	        	if(location.isHomeBase())
+	        	{
+	        		game.bombard(selectedUnits,location);
+	        	}
+	        	else
+	        	{
 	        	ArrayList<Unit> victims = new ArrayList<Unit>();
 	        	for(int ids: location.getOccupants().keySet())
 	        		victims.add(location.getOccupants().get(ids));
@@ -260,10 +266,21 @@ public class TodoServlet extends HttpServlet {
 	        	}
 	        	else
 	        		System.out.println("You can't attack there!");
-	        	
+	        	}
+	        	if(game.getPlayers().size() == 1)
+	        	{
+	        		request.setAttribute("winner",game.getPlayers().get(0).getName());
+	        		RequestDispatcher dispatcher = 
+		                    getServletContext().getRequestDispatcher("/congratulations.jsp");
+		                    dispatcher.forward(request,response);
+	        	}
+	        	else
+	        	{
 	       		RequestDispatcher dispatcher = 
 	                    getServletContext().getRequestDispatcher("/command.jsp");
 	                    dispatcher.forward(request,response);
+	        	}
+	        	
         }
 
 		else if(operation.equalsIgnoreCase("TERRITORY")){

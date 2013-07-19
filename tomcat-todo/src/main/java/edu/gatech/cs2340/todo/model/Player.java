@@ -111,33 +111,61 @@ public class Player implements Comparable<Player>
     }
     
     //cleans up army and occupiedTerritories (gets rid of destroyed units and shifts occupiedTerritories as units move
-    public void update()
+
+    public void removeDeadUnit(Unit unit)
     {
-    	removeDeadUnits();
-    }
-    public void update(Unit unit)
-    {
-    	removeDeadUnits();
-    	updateTerritories(unit);
+    	ArrayList<String> terrToBeRemoved = new ArrayList<String>();
+    	if(unit.getHealth() < 0)
+    	{
+    		army.remove(unit.getID());
+    		String territory = unit.getTerritory().getName();
+    		
+    		int currentUnitAmount = occupiedTerritories.get(territory);
+    	 	if(currentUnitAmount-1 <= 0)
+	    	{
+	    		System.out.println("Removing Territory from occupiedTerritories due to unit death.");
+	    		terrToBeRemoved.add(territory);
+	    	}
+    	 	else
+    	 		occupiedTerritories.put(territory,currentUnitAmount-1);
+    		
+    	}
+    	for(String a:terrToBeRemoved)
+    		occupiedTerritories.remove(a);
     }
     public void removeDeadUnits()
     {
-    	ArrayList<Integer> toBeRemoved = new ArrayList<Integer>();
-    	for(int id: army.keySet())
+    	ArrayList<String> terrToBeRemoved = new ArrayList<String>();
+    	ArrayList<Integer> unitToBeRemoved = new ArrayList<Integer>();
+    	for(int id:army.keySet())
     	{
-    		if(army.get(id).getHealth() <= 0)
+    		Unit unit = army.get(id);
+    		if(unit.getHealth() < 0)
     		{
-    			int currentUnitAmount = occupiedTerritories.get(army.get(id).getTerritory().getName());
-    	    	occupiedTerritories.put(army.get(id).getTerritory().getName(),currentUnitAmount-1);
-    	    	toBeRemoved.add(id);
-    	    	System.out.println("Removed!");
+    			System.out.println("This unit is DEAD!");
+    			unitToBeRemoved.add(id);
+    			String territory = unit.getTerritory().getName();
+    		
+    			int currentUnitAmount = occupiedTerritories.get(territory);
+    			if(currentUnitAmount-1 <= 0)
+    			{
+    				System.out.println("Removing Territory from occupiedTerritories due to unit death.");
+    				terrToBeRemoved.add(territory);
+    			}
+    			else
+    				occupiedTerritories.put(territory,currentUnitAmount-1);
     		}
+    	
     	}
-    	for(int id: toBeRemoved)
-    	{
-    		army.remove(id);
-    	}
+    	for(String a:terrToBeRemoved)
+    		occupiedTerritories.remove(a);
+    	for(Integer a:unitToBeRemoved)
+    		army.remove(a);
     }
+    //updateTerritories for MOVING, not as a result of being destroyed
+    //this is because destroyed units do not move when they are destroyed, and updateTerritories tries
+    //to clear out the last location of the unit. Since the destroyed unit didn't move, it will try to
+    //clear away a location that is no longer in occupiedTerritories.
     public void updateTerritories(Unit unit)
     {
     	String previousTerritory = "";
@@ -145,19 +173,23 @@ public class Player implements Comparable<Player>
     		previousTerritory = unit.getPreviouslyOccupied().getName();
     	String currentTerritory = unit.getTerritory().getName();
     	ArrayList<String> toBeRemoved = new ArrayList<String>();
-    	
-    	if(!previousTerritory.equals(""))
+
+    	System.out.println(previousTerritory);
+    	if(!previousTerritory.equals("") && occupiedTerritories.containsKey(previousTerritory))
     	{
     		int currentUnitAmount = occupiedTerritories.get(previousTerritory);
 	    	if(currentUnitAmount-1 <= 0)
 	    	{
+	    		System.out.println("Bad???");
 	    		toBeRemoved.add(previousTerritory);
 	    	}
 	    	else
 	    		occupiedTerritories.put(previousTerritory,currentUnitAmount-1);
     	}
+    	
     	for(String a: toBeRemoved)
     	{
+    		System.out.println("Waaaghh!");
     		occupiedTerritories.remove(a);
     	}
    
@@ -174,8 +206,13 @@ public class Player implements Comparable<Player>
     public void loses()
     {
     	hasLost = true;
-    	army = new TreeMap<Integer,Unit>();
-    	occupiedTerritories = new TreeMap<String,Integer>();
+    	for(int id: army.keySet())
+    		army.get(id).takeDamage(100000);
+    	
+    }
+    public boolean hasLost()
+    {
+    	return hasLost;
     }
     public void resetArmy()
     {

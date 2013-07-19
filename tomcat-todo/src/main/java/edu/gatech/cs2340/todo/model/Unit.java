@@ -59,11 +59,6 @@ public class Unit
 	{
 		health-=a;
 	}
-	public void update()
-	{
-		owner.update(this);
-		occupying.update(this);
-	}
 	public int getHealth()
 	{
 		return health;
@@ -106,7 +101,7 @@ public class Unit
 	public void move(Territory location)
 	{
 		setTerritory(location);
-		owner.update(this);
+		owner.updateTerritories(this);
 		moved = true;
 		previouslyOccupied.update(this);
 		occupying.addUnit(this);
@@ -120,9 +115,9 @@ public class Unit
 	{
 		return previouslyOccupied;
 	}
-	public void setAttacked()
+	public void setAttacked(boolean attack)
 	{
-		attacked = true;
+		attacked = attack;
 	}
 	public boolean getAttacked(){
 		return attacked;

@@ -15,7 +15,7 @@ public class RiskGame {
 
  private int gameID;
  
- public static final int ADD_PLAYERS = 0, CONFIRMATION = 1, SELECT_LOCATION = 2;
+ public static final int ADD_PLAYERS = 0, CONFIRMATION = 1, SPAWN_LOCATION = 2, MOVE_ATTACK = 3; 
  private int state; // 0-add players, 1-select territory, 
  
  ArrayList<Player> players;
@@ -117,10 +117,7 @@ public class RiskGame {
      if (state == ADD_PLAYERS) {
          if (players.size() >= 3) {
              System.out.println("Moving on to Confirmation!");
-             // calculate army numbers and turn order
              calcArmiesAndTurnOrder();
-             
-             // set the game state to confirmation
              state = CONFIRMATION;
          } else {
              result = "Not enough players.";
@@ -149,16 +146,63 @@ public class RiskGame {
  public String finishConfirmation() {
      String result = null;
      if (state == CONFIRMATION) {
-         state = 2;// next state goes here.
+         state = SPAWN_LOCATION;// next state goes here.
      } else {
          result = "State ERROR: Not CONFIRMATION.";
      }
      playerTurn = 0;
      return result;
  }
+ public void bombard(ArrayList<Unit> attackers, Territory homebase)
+ {Random rand = new Random();
+		int numAttackDice = (int) Math.floor(1+attackers.size()/4);
+		System.out.println(attackers);
+		Player victim = homebase.getPlayer();
+
+		for(Unit attacker: attackers)
+		{
+
+			int damage = attacker.getStrength();
+			String diceRolls = "";
+			for(int a = 0; a<numAttackDice;a++)
+			{	
+				int roll = rand.nextInt(6)+1;
+				damage+=roll;
+				diceRolls+=roll+", ";
+			}
+			diceRolls = diceRolls.substring(0,diceRolls.length()-2);
+			
+			System.out.println(attacker.getName() +"-"+attacker.getID()+"- is attacking "+victim.getName()+"'s homebase!");
+			System.out.println(attacker.getName() +"-"+attacker.getID()+"- rolled "+numAttackDice+" dice ("+diceRolls+") plus its strength ("+attacker.getStrength()+") for "+damage+" damage!");
+		
+			homebase.takeDamage(damage);
+			
+		}
+		if(victim.hasLost())
+		{
+			for(Territory[] a: map)
+				for(Territory b: a)
+					b.removeDeadUnits();
+			for(int a = 0; a<players.size()-2)
+				nextTurn();
+			System.out.println(victim.getName()+" has lost!!!");
+			for(int a = 0; a<players.size();a++)
+			{
+				if(players.get(a).getName().equals(victim.getName()))
+				{	players.remove(a);
+					break;
+				}
+			}
+		}
+		if(players.size() == 1)
+			state = ADD_PLAYERS;
+		
+ }
+ 
 public void fight(ArrayList<Unit> attackers, ArrayList<Unit> defenders)
 {
-	Random rand = new Random();
+
+		Random rand = new Random();
 		int numAttackDice = (int) Math.floor(1+attackers.size()/4);
 		int numDefenseDice = (int) Math.floor(1+defenders.size()/4);
 				
@@ -201,14 +245,18 @@ public void fight(ArrayList<Unit> attackers, ArrayList<Unit> defenders)
 			if(damage < 0)
 				damage = 0;
 			victim.takeDamage(damage);
+			attacker.setAttacked(true);
 			System.out.println(victim.getName() + "-"+victim.getID()+" was attacked for "+damage+" down to "+victim.getHealth()+"/"+victim.getMaxHealth()+"!");
 			
 			}
 	
 		}
-		for(Unit a: defenders)
-			a.update();
-		
+		for(Player player:players)
+			player.removeDeadUnits();
+		for(Territory[] a: map)
+			for(Territory b: a)
+				b.removeDeadUnits();
+	
 }
  
  public Territory[][] initializeBoard()
@@ -288,20 +336,22 @@ public void fight(ArrayList<Unit> attackers, ArrayList<Unit> defenders)
  }
  public int spawn(Territory[][] maps, Unit unit, int amount, int[] coords,int idn) 
  {
-	
-	for(int i = 0; i < coords.length; i+=2)
+	if(state == SPAWN_LOCATION)
 	{
-		for(int a = 1; a <= amount; a++)
+		for(int i = 0; i < coords.length; i+=2)
 		{
-		Unit toBeAdded = new Unit(unit.getName(),unit.getHealth(),unit.getStrength(),unit.getDefense(),unit.getOwner());
-		toBeAdded.setID(idn++);
-		toBeAdded.setTerritory(maps[coords[i]][coords[i+1]]);
-		toBeAdded.getOwner().addUnit(toBeAdded);
-		maps[coords[i]][coords[i+1]].addUnit(toBeAdded);
-		}
-		System.out.println("Spawning "+amount+" "+unit.getName()+"(s) at ["+coords[i]+","+coords[i+1]+"] for "+players.get(getCurrTurn()).getName());
+			for(int a = 1; a <= amount; a++)
+			{
+				Unit toBeAdded = new Unit(unit.getName(),unit.getHealth(),unit.getStrength(),unit.getDefense(),unit.getOwner());
+				toBeAdded.setID(idn++);
+				toBeAdded.setTerritory(maps[coords[i]][coords[i+1]]);
+				toBeAdded.getOwner().addUnit(toBeAdded);
+				maps[coords[i]][coords[i+1]].addUnit(toBeAdded);
+			}
+			System.out.println("Spawning "+amount+" "+unit.getName()+"(s) at ["+coords[i]+","+coords[i+1]+"] for "+players.get(getCurrTurn()).getName());
 	
- 	}
+		}
+	}
 	return idn;
  }
  

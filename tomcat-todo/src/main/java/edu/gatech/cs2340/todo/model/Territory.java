@@ -15,18 +15,20 @@ public class Territory implements Comparable<Territory>
 	Player occupiedByPlayer; 
 	boolean occupiable;
 	boolean homeBase;
+	int health; //only for homebases
 
 	public Territory(String name, int[] coords)
 	{
 	
-	this.name=name;
-	coordinates = coords;
-	resources = new ArrayList<Resource>();
-	isOccupied = false;
-    occupiedByUnit = new TreeMap<Integer,Unit>();
-	occupiedByPlayer = null;
-	occupiable = true;
-	homeBase = false;
+		this.name=name;
+		coordinates = coords;
+		resources = new ArrayList<Resource>();
+		isOccupied = false;
+		occupiedByUnit = new TreeMap<Integer,Unit>();
+		occupiedByPlayer = null;
+		occupiable = true;
+		homeBase = false;
+		health = 0;
 	}
 	public int compareTo(Territory other)
 	{
@@ -57,7 +59,17 @@ public class Territory implements Comparable<Territory>
 	    makeNotOccupiable();
 	    occupiedByPlayer = player;
 	    player.setHomeBase(coordinates[0],coordinates[1]);
-    } 
+	    health = 150;
+    }
+	public void takeDamage(int damage)
+	{
+		int dmg = damage-10;
+		if(dmg > 0)
+			health -=dmg;
+		System.out.println("Homebase only has "+health+" health left!");
+		if(health <= 0)
+			occupiedByPlayer.loses();
+	}
 	public boolean isHomeBase()
 	{
 		return homeBase;
@@ -120,30 +132,28 @@ public class Territory implements Comparable<Territory>
 
 	public void update(Unit unit)
 	{
-    	if(!equals(unit.getTerritory().getCoords()) || unit.getHealth() < 0)
+    	if(!Arrays.equals(coordinates, unit.getTerritory().getCoords()))
+    	{
     		occupiedByUnit.remove(unit.getID());
+    	}
     	if(occupiedByUnit.size() == 0)
     		isOccupied = false;
 
 	}
-	 public void removeDeadUnits()
-	    {
-	 //   	ArrayList<Integer> toBeRemoved = new ArrayList<Integer>();
-/*	    	for(int id: army.keySet())
-	    	{
-	    		if(army.get(id).getHealth() <= 0)
-	    		{
-	    			int currentUnitAmount = occupiedTerritories.get(army.get(id).getTerritory().getName());
-	    	    	occupiedTerritories.put(army.get(id).getTerritory().getName(),currentUnitAmount-1);
-	    	    	toBeRemoved.add(id);
-	    	    	System.out.println("Removed!");
-	    		}
-	    	}
-	    	for(int id: toBeRemoved)
-	    	{
-	    		army.remove(id);
-	    	}*/
-	    }
+	public void removeDeadUnits()
+    {
+		ArrayList<Integer> toBeRemoved = new ArrayList<Integer>();
+    	for(int id : occupiedByUnit.keySet())
+    	{
+    		Unit unit = occupiedByUnit.get(id);
+    		if(unit.getHealth()<0)
+    			toBeRemoved.add(id);	
+    	}
+    	for(int id:toBeRemoved)
+    		occupiedByUnit.remove(id);
+    	if(occupiedByUnit.size() == 0)
+    		isOccupied = false;
+    }
 	public String toString()
 	{
 		return name;
