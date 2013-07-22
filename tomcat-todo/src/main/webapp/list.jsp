@@ -3,6 +3,8 @@
 
 <% ArrayList<Player> players =
    (ArrayList<Player>) request.getAttribute("players"); 
+   int gameID = (Integer)request.getAttribute("gameID");
+   int playerActionsSoFar = (Integer)request.getAttribute("playerActionsSoFar");
    %>
  
 
@@ -14,7 +16,12 @@
 </head>
 <body>
 <h1>Risk!</h1>
-
+GameID: <%=gameID%><br>
+<form action=/todo/update method="POST">
+<input type="hidden" name="operation" value="LOAD" />
+<input type="hidden" name="gameID" value="<%=gameID%>">
+<input type ="Submit" value = "Refresh" ><br>
+</form>
 <table>
 <tr>
 <th>Player</th><th>Country</th>
@@ -27,6 +34,8 @@ The number of players is <%=players.size() %><br>
 <tr>
 <form action="/todo/update/<%= id %>" method="POST">
   <input type="hidden" name="operation" value="PUT"/>
+  <input type="hidden" name="gameID" value="<%=gameID%>">
+  <input type="hidden" name="playerActionsSoFar" value="<%=playerActionsSoFar%>">
   <td><input type="text" name="Name" value="<%= player.getName() %>"/></td>
  <td><select name="Country">
 <option value="Polaris">Polaris</option>
@@ -44,6 +53,8 @@ Player <%=id+1%> is from <span style ="color:<%= colorCode(player) %>"> <%= play
   <form action="/todo/delete/<%= id %>" method="POST">
   <!-- hidden operation element to simulate HTTP DELETE method in server -->
     <input type="hidden" name="operation" value="DELETE"/>
+    <input type="hidden" name="gameID" value="<%=gameID%>">
+    <input type="hidden" name="playerActionsSoFar" value="<%=playerActionsSoFar%>">
     <input type="submit" value="Delete"/>
   </form>
  </td>
@@ -54,6 +65,8 @@ Player <%=id+1%> is from <span style ="color:<%= colorCode(player) %>"> <%= play
 <form action="/todo/update" method="POST">
  <td> <input type="text" name="Name"/></td>
 <input type = "hidden" name = "operation" value="ADD" />
+<input type="hidden" name="gameID" value="<%=gameID%>">
+<input type="hidden" name="playerActionsSoFar" value="<%=playerActionsSoFar%>">
 <td> <select name="Country">
 <option value="Polaris">Polaris</option>
 <option value="Alpha-Centauri">Alpha-Centauri</option>
@@ -69,7 +82,9 @@ Player <%=id+1%> is from <span style ="color:<%= colorCode(player) %>"> <%= play
 </table>
 
 <form action = "/todo/update" method = "POST">
-
+<input type="hidden" name="operation" value="CONFIRMATION">
+<input type="hidden" name="gameID" value="<%=gameID%>">
+<input type="hidden" name="playerActionsSoFar" value="<%=playerActionsSoFar%>">
 <%
 ArrayList<Integer> turns = new ArrayList<Integer>();
 for(int b = 1; b <= players.size(); b++)
@@ -88,9 +103,9 @@ for(int c = 0; c < players.size(); c++)
 if (player==null) {return "pink";}
 else if (player.getCountry().equals("Polaris")) { return "purple";}
 else if (player.getCountry().equals("Alpha-Centauri")) { return "green";}
-else if (player.getCountry().equals("Char")) { return "red";} 
+else if (player.getCountry().equals("Char")) { return "red";}
 else if (player.getCountry().equals("Midichloria")) { return "blue";}
-else if (player.getCountry().equals("Borg")) { return "gray";} 
+else if (player.getCountry().equals("Borg")) { return "gray";}
 else if (player.getCountry().equals("HAL Space Station")) { return "orange";}
  return "";} %>
 

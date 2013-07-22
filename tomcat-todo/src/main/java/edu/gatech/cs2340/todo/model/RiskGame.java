@@ -13,55 +13,155 @@ import java.util.*;
 
 public class RiskGame {
 
- private int gameID;
+    private static int gameIDs = 0;
+    private int gameID;
  
- public static final int ADD_PLAYERS = 0, CONFIRMATION = 1, SPAWN_LOCATION = 2, MOVE_ATTACK = 3; 
+ public static final int ADD_PLAYERS = 0, CONFIRMATION = 1, SELECT_LOCATION = 2, 
+                                COMMAND = 3;
  private int state; // 0-add players, 1-select territory, 
  
  ArrayList<Player> players;
  Territory[][] map;
+ int turnCount;
  int playerTurn;
+ int playerActionsSoFar;
  int id = 1000;
  
- public RiskGame(int gameID) {
-     this.gameID = gameID;
+ public RiskGame() {
+     this.gameID = gameIDs;
+     gameIDs += 1;
      this.state = ADD_PLAYERS;
+     this.turnCount = 0;
      this.players = new ArrayList<Player>();
      this.playerTurn = 0;
+     this.playerActionsSoFar = 0;
      map = new Territory[0][0];
- }
- 
- // general functionality
+}
 
- public int getGameID() {
-     return gameID;
- }
- 
- public int getGameState() {
-     return state;
- }
- public int getCurrTurn()
- {
-	 return playerTurn;
- }
- public ArrayList<Player> getPlayers() {
-     return players;
- }
- public Territory[][] getMap()
- {
- 	return map;
- }
- public int getID()
- {
-	 id++;
-	 return id;
- }
- public void nextTurn()
- {
-	 playerTurn++;
-	 if (playerTurn == players.size())
-		 playerTurn = 0;
- }
+
+// general functionality
+
+public int getGameID() {
+    return gameID;
+}
+
+public int getGameState() {
+    return state;
+}
+
+public int getTurnCount() {
+    return turnCount;
+}
+
+public int getCurrTurn()
+{
+	return playerTurn;
+}
+
+public int getPlayerActionsSoFar() {
+    return playerActionsSoFar;
+}
+
+public ArrayList<Player> getPlayers() {
+    return players;
+}
+
+public Player getCurrentPlayer() {
+    // get the player whose turn it is.
+    return players.get(getCurrTurn());
+}
+
+public Territory[][] getMap()
+{
+    return map;
+}
+
+public int getID()
+{
+	id++;
+	return id;
+}
+
+// main state interaction functions
+public void nextTurn()
+{
+    turnCount += 1;
+    playerTurn++;
+	if (playerTurn == players.size())
+		playerTurn = 0;
+    playerActionsSoFar = 0;
+    state = SELECT_LOCATION;
+}
+
+public boolean spawnUpdate(int[] co) {
+    boolean success = false;
+    
+    if (state == SELECT_LOCATION) {
+        // spawn for this
+        Player player = getCurrentPlayer();
+        if (check(co, player)) {
+            spawn(getMap(), "Space Frigate", 40, 6, 0, 1, player, co);
+            state = COMMAND;
+            success = true;
+            playerActionsSoFar += 1;
+        }
+    }
+    return success;
+}
+
+public boolean moveUpdate(ArrayList<Integer> selectedUnitIDs, int[] moveCo) {
+    boolean success = false;
+    ArrayList<Unit> selectedUnits = new ArrayList<Unit>();
+    for (int i = 0; i < selectedUnitIDs.size(); i++)
+        selectedUnits.add( getCurrentPlayer().getArmy().get( selectedUnitIDs.get(i) ) );
+    int[] startCo = selectedUnits.get(0).getTerritory().getCoords();
+    Territory location = map[moveCo[0]][moveCo[1]];
+    
+    // try to move selected units
+    if (checkAdjacent(startCo, moveCo)) {
+        for(Unit a: selectedUnits) {
+            if (!a.getMoved()) {
+                a.move(location);
+            }
+        }
+        success = true;
+        playerActionsSoFar += 1;
+    }
+    
+    return success;
+}
+
+public boolean attackUpdate(ArrayList<Integer> selectedUnitIDs, int[] moveCo) {
+    boolean success = false;
+    ArrayList<Unit> selectedUnits = new ArrayList<Unit>();
+    for (int i = 0; i < selectedUnitIDs.size(); i++)
+        selectedUnits.add( getCurrentPlayer().getArmy().get( selectedUnitIDs.get(i) ) );
+    int[] startCo = selectedUnits.get(0).getTerritory().getCoords();
+    Territory location = map[moveCo[0]][moveCo[1]];
+    ArrayList<Unit> victims = new ArrayList<Unit>();
+	for(int ids: location.getOccupants().keySet())
+        victims.add(location.getOccupants().get(ids));
+    
+    // try the attack
+    boolean attackSucceed = true;
+    if (checkAdjacent(startCo, moveCo)) {
+        System.out.println("We are attacking!");
+        success = true;
+        playerActionsSoFar += 1;
+        for (Unit a: selectedUnits) {
+            if (a.getAttacked())
+                attackSucceed = false;
+        }
+        
+        if (attackSucceed) {
+            fight(selectedUnits, victims);
+        } else {
+            System.out.println("Some of the selected units can't attack!");
+        }
+    }
+    return success;
+}
+
 
  /**
    * add players state functions
@@ -72,11 +172,12 @@ public class RiskGame {
  public String addPlayer(String name, String country) {
      String result = null;
      if (state == ADD_PLAYERS) {
-         if (players.size() <= 6) {
+         if (players.size() < 6) {
              System.out.println("We're adding a player!");
              // make sure not a duplicate
              if (!duplicateCountry(country)) {
                  players.add(new Player(name, country));
+                 playerActionsSoFar += 1;
              } else {
             	 System.out.println("Players cannot choose the same country!");
                  result = "Players cannot choose the same country!";
@@ -87,6 +188,7 @@ public class RiskGame {
      }
      return result;
  }
+ 
  public String removePlayer(int id)
  {
 	 String result = "";
@@ -95,6 +197,7 @@ public class RiskGame {
 		 System.out.println("We're deleting a player!");
 		 players.remove(id);
 		 result = "Removed!";
+         playerActionsSoFar += 1;
 	 }
 	 return result;
 	 
@@ -115,9 +218,12 @@ public class RiskGame {
  public String finishAddingPlayers() {
      String result = null;
      if (state == ADD_PLAYERS) {
-         if (players.size() >= 3) {
+         if ( players.size() >= 3 && players.size() < 7 ) { // removed redundant duplicateCountries()
              System.out.println("Moving on to Confirmation!");
+             // calculate army numbers and turn order
              calcArmiesAndTurnOrder();
+             
+             // set the game state to confirmation
              state = CONFIRMATION;
          } else {
              result = "Not enough players.";
@@ -139,70 +245,25 @@ public class RiskGame {
  	System.out.println(players.get(c));
  	 }
  	Collections.sort(players);
-
  }
  
  // confirmation state functions
  public String finishConfirmation() {
      String result = null;
      if (state == CONFIRMATION) {
-         state = SPAWN_LOCATION;// next state goes here.
+         state = SELECT_LOCATION;// next state goes here.
+         initializeBoard();
      } else {
          result = "State ERROR: Not CONFIRMATION.";
      }
      playerTurn = 0;
+     playerActionsSoFar = 0;
      return result;
- }
- public void bombard(ArrayList<Unit> attackers, Territory homebase)
- {Random rand = new Random();
-		int numAttackDice = (int) Math.floor(1+attackers.size()/4);
-		System.out.println(attackers);
-		Player victim = homebase.getPlayer();
-
-		for(Unit attacker: attackers)
-		{
-
-			int damage = attacker.getStrength();
-			String diceRolls = "";
-			for(int a = 0; a<numAttackDice;a++)
-			{	
-				int roll = rand.nextInt(6)+1;
-				damage+=roll;
-				diceRolls+=roll+", ";
-			}
-			diceRolls = diceRolls.substring(0,diceRolls.length()-2);
-			
-			System.out.println(attacker.getName() +"-"+attacker.getID()+"- is attacking "+victim.getName()+"'s homebase!");
-			System.out.println(attacker.getName() +"-"+attacker.getID()+"- rolled "+numAttackDice+" dice ("+diceRolls+") plus its strength ("+attacker.getStrength()+") for "+damage+" damage!");
-		
-			homebase.takeDamage(damage);
-			
-		}
-		if(victim.hasLost())
-		{
-			for(Territory[] a: map)
-				for(Territory b: a)
-					b.removeDeadUnits();
-			for(int a = 0; a<players.size()-2)
-				nextTurn();
-			System.out.println(victim.getName()+" has lost!!!");
-			for(int a = 0; a<players.size();a++)
-			{
-				if(players.get(a).getName().equals(victim.getName()))
-				{	players.remove(a);
-					break;
-				}
-			}
-		}
-		if(players.size() == 1)
-			state = ADD_PLAYERS;
-		
- }
+}
  
 public void fight(ArrayList<Unit> attackers, ArrayList<Unit> defenders)
 {
-
-		Random rand = new Random();
+	Random rand = new Random();
 		int numAttackDice = (int) Math.floor(1+attackers.size()/4);
 		int numDefenseDice = (int) Math.floor(1+defenders.size()/4);
 				
@@ -245,22 +306,18 @@ public void fight(ArrayList<Unit> attackers, ArrayList<Unit> defenders)
 			if(damage < 0)
 				damage = 0;
 			victim.takeDamage(damage);
-			attacker.setAttacked(true);
 			System.out.println(victim.getName() + "-"+victim.getID()+" was attacked for "+damage+" down to "+victim.getHealth()+"/"+victim.getMaxHealth()+"!");
 			
 			}
 	
 		}
-		for(Player player:players)
-			player.removeDeadUnits();
-		for(Territory[] a: map)
-			for(Territory b: a)
-				b.removeDeadUnits();
-	
+		for(Unit a: defenders)
+			a.update();
+		
 }
- 
- public Territory[][] initializeBoard()
- {
+
+public Territory[][] initializeBoard()
+{
  	map = new Territory[9][15];
  	for(int a = 0; a <9; a++)
  	{
@@ -274,7 +331,7 @@ public void fight(ArrayList<Unit> attackers, ArrayList<Unit> defenders)
  	}
  
  	//pretty sure we're just going to give everyone the same generic unit in the future
- 	Unit ACUnit = new Unit("Alpha-Centaurian Space Frigate",5,3,1,null);
+ 	Unit ACUnit = new Unit("Alpha-Centaurian Space Frigate",5,3,1,null); // remove this crap last--Brian
  	Unit PolarisUnit = new Unit("Polarian Manta",4,5,2,null);
  	Unit CharUnit = new Unit("Char Swarmling",3,2,0,null);
  	Unit BorgUnit = new Unit("Borg Assimilator",8,2,2,null);
@@ -283,7 +340,7 @@ public void fight(ArrayList<Unit> attackers, ArrayList<Unit> defenders)
  	int armysize = (10-players.size()); 
  	ArrayList<String> countries = new ArrayList<String>(); 
  	for (Player player: players) { 
- 		 countries.add(player.getCountry()); 
+ 		 countries.add(player.getCountry());
  		 if(player.getCountry().equals("Alpha-Centauri")){ACUnit.setOwner(player);}
  		 else if(player.getCountry().equals("Polaris")){PolarisUnit.setOwner(player);}
  		 else if(player.getCountry().equals("Char")){CharUnit.setOwner(player);}
@@ -293,70 +350,96 @@ public void fight(ArrayList<Unit> attackers, ArrayList<Unit> defenders)
  	}
  	
  	 if(countries.contains("Alpha-Centauri")){
- 		 map[0][1].makeHomeBase(players.get(countries.indexOf("Alpha-Centauri"))); 
+         Player aPlayer = players.get(countries.indexOf("Alpha-Centauri"));
+ 		 map[0][1].makeHomeBase(aPlayer); 
  		 int[] coords ={0,0,1,0,1,1,1,2,0,2};
- 		 id = spawn(map, ACUnit,armysize,coords,id); 
+ 		 id = spawn(map, "Alpha-Centaurian Space Frigate", 5, 3, 1 , armysize, aPlayer, coords); 
  		 }
  		 
  		 //upper middle is Polaris
  		 if(countries.contains("Polaris")){
- 			map[0][7].makeHomeBase(players.get(countries.indexOf("Polaris"))); 
+            Player aPlayer = players.get(countries.indexOf("Polaris"));
+ 			map[0][7].makeHomeBase(aPlayer); 
  			int[] coords = {0,6,1,6,1,7,1,8,0,8};
- 		 	id=spawn(map, PolarisUnit,armysize,coords,id);  
+ 		 	id=spawn(map, "Polarian Manta",4,5,2,armysize, aPlayer, coords);  
  		 }
  		 //upper right is Midichloria
  		 if(countries.contains("Midichloria")){
- 			map[0][13].makeHomeBase(players.get(countries.indexOf("Midichloria")));
+            Player aPlayer = players.get(countries.indexOf("Midichloria"));
+ 			map[0][13].makeHomeBase(aPlayer);
  			int[] coords = {0,12,1,12,1,13,1,14,0,14};
- 			id=spawn(map, MidiUnit,armysize,coords,id); 
+ 			id=spawn(map, "Midichlorian Force",6,4,1,armysize, aPlayer, coords); 
  		}
  		 
  		 //bottom left Char
  		 if(countries.contains("Char")){
- 			map[8][1].makeHomeBase(players.get(countries.indexOf("Char")));
+            Player aPlayer = players.get(countries.indexOf("Char"));
+ 			map[8][1].makeHomeBase(aPlayer);
  			int[] coords = {8,0,7,0,7,1,7,2,8,2};
- 			id=spawn(map, CharUnit,armysize,coords,id); 
+ 			id=spawn(map, "Char Swarmling",3,2,0,armysize, aPlayer,coords); 
  		 }
 
  		 //bottom middle is HAL Space Station
  		 if(countries.contains("HAL Space Station")){
- 			 map[8][7].makeHomeBase(players.get(countries.indexOf("HAL Space Station"))); 
+             Player aPlayer = players.get(countries.indexOf("HAL Space Station"));
+ 			 map[8][7].makeHomeBase(aPlayer); 
  			 int[] coords = {8,6,7,6,7,7,7,8,8,8};
- 			id= spawn(map, HALUnit,armysize,coords,id); 
+ 			id= spawn(map, "HSS Probe",5,3,1 ,armysize, aPlayer, coords); 
  		}
  		 
  		 //bottom right is Borg
  		 if(countries.contains("Borg")){
- 			 map[8][13].makeHomeBase(players.get(countries.indexOf("Borg"))); 
+             Player aPlayer = players.get(countries.indexOf("Borg"));
+ 			 map[8][13].makeHomeBase(aPlayer); 
  			 int[] coords = {8,14,7,14,7,13,7,12,8,12};
- 			id= spawn(map, BorgUnit,armysize,coords,id); 
+ 			id= spawn(map, "Borg Assimilator",8,2,2, armysize, aPlayer, coords); 
  		}
 
  	return map;
  }
- public int spawn(Territory[][] maps, Unit unit, int amount, int[] coords,int idn) 
+
+ public int spawn(Territory[][] maps, String name, int health, int strength, int defense,
+                                int amount, Player owner, int[] coords) 
  {
-	if(state == SPAWN_LOCATION)
+	int unitID = -1;
+	for(int i = 0; i < coords.length; i+=2)
 	{
-		for(int i = 0; i < coords.length; i+=2)
+		for(int a = 1; a <= amount; a++)
 		{
-			for(int a = 1; a <= amount; a++)
-			{
-				Unit toBeAdded = new Unit(unit.getName(),unit.getHealth(),unit.getStrength(),unit.getDefense(),unit.getOwner());
-				toBeAdded.setID(idn++);
-				toBeAdded.setTerritory(maps[coords[i]][coords[i+1]]);
-				toBeAdded.getOwner().addUnit(toBeAdded);
-				maps[coords[i]][coords[i+1]].addUnit(toBeAdded);
-			}
-			System.out.println("Spawning "+amount+" "+unit.getName()+"(s) at ["+coords[i]+","+coords[i+1]+"] for "+players.get(getCurrTurn()).getName());
-	
+		Unit toBeAdded = new Unit(name, health, strength, defense, owner);
+		unitID = toBeAdded.getID();
+        toBeAdded.setTerritory(maps[coords[i]][coords[i+1]]);
+		toBeAdded.getOwner().addUnit(toBeAdded);
+		maps[coords[i]][coords[i+1]].addUnit(toBeAdded);
 		}
-	}
-	return idn;
+		System.out.println("Spawning "+amount+" "+name+"(s) at ["+coords[i]+","+coords[i+1]+"] for "+players.get(getCurrTurn()).getName());
+	
+ 	}
+	return unitID;
  }
- 
- 
- 
+
+protected boolean check(int[] coords, Player player)
+{
+    	int homebasey = player.getHomebaseCoords()[0];
+    	int homebasex = player.getHomebaseCoords()[1];
+    	
+    	int y = coords[0];
+    	int x = coords[1];
+    	
+    	return Math.abs(homebasey-y) <= 1 && Math.abs(homebasex-x) <=1;
+    	
+    	
+}
+
+protected boolean checkAdjacent(int[] homeCo, int[] adjacentCo){
+		int homeX = homeCo[1];
+		int homeY = homeCo[0];
+		
+		int adjX = adjacentCo[1];
+		int adjY = adjacentCo[0];
+		
+		return Math.abs(homeX-adjX) <= 1 && Math.abs(homeY-adjY) <=1;
+}
  
  public String toString()
  {

@@ -1,11 +1,5 @@
 Changelog
 ============================
-7/19/2013
--Added congratulations.jsp, to display winner and prompt users to play a new game.
--Modified RiskGame, TodoServlet, and Territory to reflect victory condition (destroying homebases)
--Game ends when the 2nd to last Homebase is destroyed.
--M5 finished.
-
 7/16/2013
 -Added command.jsp, where players can command their units to move and attack
 -Modified TodoServlet to include input from command .jsp

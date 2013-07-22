@@ -4,11 +4,17 @@
 </head>
 <h1>Risk!</h1>
 <body>
-<form action =/todo/list method="PUT">
-<form type = "hidden" name = "operation" method="NEW">
+<form action =/todo/list method="POST"><!-- Used to be /todo/list and "PUT" -->
+<input type = "hidden" name ="operation" value="NEW">
 <input type ="Submit" value = "New Game"><br>
 </form>
-<input type ="Submit" value = "Load Game"><br>
+
+<form action=/todo/update method="POST">
+<input type="hidden" name="operation" value="LOAD" />
+<input type ="Submit" value = "Load Game" ><br>
+GameID: <input type="text" name="gameID"><br>
+</form>
+
 <input type ="Submit" value = "Credits"><br>
 
 </body>

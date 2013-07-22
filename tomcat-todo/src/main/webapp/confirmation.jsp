@@ -7,22 +7,32 @@
 
 <% //some initializations
 //nearly all of this code needs to merged into the RiskGame class.
-
-
 %>
-<html>
-<head>
-<title>The Game!</title>
-
-
 
 <%//instantiating the map 
 ArrayList<Player> players = (ArrayList<Player>) request.getAttribute("players");
-Territory[][] map = (Territory[][]) request.getAttribute("map"); 
+Territory[][] map = (Territory[][]) request.getAttribute("map");
 Player currPlayer = (Player) request.getAttribute("currplayer");
 TreeMap<Integer,Unit> occupants = (TreeMap<Integer,Unit>) request.getAttribute("occupants");
 Collections.sort(players);
-currPlayer.resetArmy();%>
+currPlayer.resetArmy();
+int gameID = (Integer)request.getAttribute("gameID");
+int turnCount = (Integer)request.getAttribute("turnCount");
+int playerTurn = (Integer)request.getAttribute("playerTurn");
+//int playerActionsSoFar = (Integer)request.getAttribute("playerActionsSoFar"); 
+int imageTopPX = 400;
+int imageLeftPX = 0;%>
+
+
+<html>
+<head>
+<title>The Game!</title>
+GameID: <%=gameID%><br>
+<form action=/todo/update method="POST">
+<input type="hidden" name="operation" value="LOAD" />
+<input type="hidden" name="gameID" value="<%=gameID%>">
+<input type ="Submit" value = "Refresh" ><br>
+</form>
 
 <% for (Player player: players) { %>
 <span style ="color:<%= player.getColor() %>"> <%= player %></span><br>
@@ -40,6 +50,9 @@ The "#"s in each territory represent the number of Units in each territory!<br>
 It's <span style="color<%=currPlayer.getColor()%>"><%=currPlayer.getName()%>'s turn to spawn a new Unit!</span>
 <form action = "update" method="POST">
 <input type="hidden" name = "operation" value = "SPAWN"/>
+<input type="hidden" name="gameID" value="<%=gameID%>">
+<input type="hidden" name="turnCount" value="<%=turnCount%>">
+<input type="hidden" name="playerTurn" value="<%=playerTurn%>">
 <input type="text" name="Coord1"/>
 <input type="text" name="Coord2"/>
 
@@ -47,21 +60,22 @@ It's <span style="color<%=currPlayer.getColor()%>"><%=currPlayer.getName()%>'s t
 </form>
 
 
-[~]<% for(int a = 0; a < 15;a++){ %>[<%=a%>]<%}%>
-<br>
+
+
+<img style="position:absolute; top:<%=imageTopPX%>px; left:<%=imageLeftPX%>px; width:1125px; height:675px" src="images\space_map_grid_only.png">
 <%//printing the map 
   for(int a = 0; a <9; a++)
-  { %>
-	[<%=a%>]<%
+  { %><%
 	for(int b = 0; b < 15; b++)	
 	{
- 	if(map[a][b].hasResources()) { %>[x]<% }   
-	if(map[a][b].isHomeBase()) {%>[<span style="color:<%=map[a][b].getPlayer().getColor()%>">O</span>]<%} 
- 	if(map[a][b].isOccupied()) { %>[<span style="color:<%=map[a][b].getPlayer().getColor()%>"><%=map[a][b].getOccupants().size()%></span>]<%} 
-	if (!map[a][b].hasResources() && !map[a][b].isHomeBase() && !map[a][b].isOccupied()) {%>[ ]<%}  
-	 }%>
-<br>	
+ 	if(map[a][b].hasResources()) { %><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images\<%=map[a][b].getPlayer().getColor()%>_starship.png"><% }   
+	if(map[a][b].isHomeBase()) {%><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images\<%=map[a][b].getPlayer().getColor()%>_station.png"><%} 
+ 	if(map[a][b].isOccupied()) { %><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images\<%=map[a][b].getPlayer().getColor()%>_starship.png"><%} 
+	if (!map[a][b].hasResources() && !map[a][b].isHomeBase() && !map[a][b].isOccupied()) {%><%}  
+	 }%>	
 <%}%>
+
+
 </font> 
 
 </head>

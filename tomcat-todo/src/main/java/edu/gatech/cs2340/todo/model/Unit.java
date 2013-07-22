@@ -6,6 +6,8 @@ import java.util.*;
 
 public class Unit
 {
+    private static int unitIDs = 0;
+    
 	String name;
 	int id; 
 	int health;
@@ -23,7 +25,8 @@ public class Unit
 	public  Unit(String name, int health, int strength, int defense)
 	{
 		this.name = name;
-		id = 0;
+		id = unitIDs;
+        unitIDs += 1;
 		this.health = maxHealth = health;
 		this.strength=strength;
 		this.defense = defense;
@@ -36,10 +39,12 @@ public class Unit
 		
 		
 	}
+    
 	public  Unit(String name, int health, int strength, int defense, Player owner)
 	{
 		this.name = name;
-		id = 0;
+		id = unitIDs;
+        unitIDs += 1;
 		this.health = maxHealth = health;
 		this.strength=strength;
 		this.defense = defense;
@@ -51,46 +56,64 @@ public class Unit
 		moved = false;
 		
 	}
+    
 	public String getName()
 	{
 		return name;
 	}
+    
 	public void takeDamage(int a)
 	{
 		health-=a;
 	}
+    
+	public void update()
+	{
+		owner.update(this);
+		occupying.update(this);
+	}
+    
 	public int getHealth()
 	{
 		return health;
 	}
+    
 	public int getMaxHealth()
 	{
 		return maxHealth;
 	}
+    
 	public int getStrength()
 	{
 		return strength;
 	}
+    
 	public int getDefense()
 	{
 		return defense;
 	}
+    
+    /*
 	public void setID(int id)
 	{
 		this.id = id;
-	}
+	}*/
+    
 	public int getID()
 	{
 		return id;
 	}
+    
 	public void setOwner(Player player)
 	{
 		owner = player;
 	}
+    
 	public Player getOwner()
 	{
 		return owner;
 	}
+    
 	//setTerritory and move methods separated to smooth over Player.update()
 	public void setTerritory(Territory location)
 	{
@@ -98,10 +121,11 @@ public class Unit
 		occupying = location;
 
 	}
+    
 	public void move(Territory location)
 	{
 		setTerritory(location);
-		owner.updateTerritories(this);
+		owner.update(this);
 		moved = true;
 		previouslyOccupied.update(this);
 		occupying.addUnit(this);
@@ -111,14 +135,17 @@ public class Unit
 	{
 		return occupying;
 	}
+    
 	public Territory getPreviouslyOccupied()
 	{
 		return previouslyOccupied;
 	}
-	public void setAttacked(boolean attack)
+    
+	public void setAttacked()
 	{
-		attacked = attack;
+		attacked = true;
 	}
+    
 	public boolean getAttacked(){
 		return attacked;
 	}
@@ -126,10 +153,12 @@ public class Unit
 	public boolean getMoved(){
 		return moved;
 	}	
+    
 	public void resetForTurn()
 	{
 		attacked = moved = false;
 	}
+    
 	public String toString()
 	{
 		return name+"-"+getID()+" has "+health+"/"+maxHealth+" health, is at "+occupying+

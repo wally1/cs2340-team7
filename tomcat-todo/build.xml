@@ -49,7 +49,14 @@
     
     <copy  todir="${catalina.home}/webapps/${app.name}">
       <fileset dir="${build.home}"/>
-    </copy>    
+    </copy>
+    
+    <mkdir dir="${catalina.home}/webapps/${app.name}/images"/>
+    <copy todir="${catalina.home}/webapps/${app.name}/images">
+        <fileset dir="${basedir}/src/main/graphics/testing"
+               includes="**/*.png*"
+        />
+    </copy>
   </target>
 
 </project>
