@@ -1,0 +1,5 @@
+.bg {
+    background-image: url("space_map_grid_only.png");
+	background-repeat: no-repeat;
+	margin-right: auto; margin-left: auto; width: 1125px; height: 675px;
+}

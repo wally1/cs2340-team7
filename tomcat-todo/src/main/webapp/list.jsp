@@ -86,11 +86,11 @@ for(int c = 0; c < players.size(); c++)
 
 <%! public String colorCode(Player player){ 
 if (player==null) {return "pink";}
-else if (player.getCountry().equals("Polaris")) { return "purple";}
+else if (player.getCountry().equals("Polaris")) { return "blue";}
 else if (player.getCountry().equals("Alpha-Centauri")) { return "green";}
 else if (player.getCountry().equals("Char")) { return "red";} 
-else if (player.getCountry().equals("Midichloria")) { return "blue";}
-else if (player.getCountry().equals("Borg")) { return "gray";} 
+else if (player.getCountry().equals("Midichloria")) { return "#FFD700";}
+else if (player.getCountry().equals("Borg")) { return "purple";} 
 else if (player.getCountry().equals("HAL Space Station")) { return "orange";}
  return "";} %>
 

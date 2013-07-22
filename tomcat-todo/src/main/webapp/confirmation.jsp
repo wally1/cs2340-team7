@@ -12,10 +12,12 @@
 %>
 <html>
 <head>
+<link rel="stylesheet" type="text/css" href="stylesheet.css">
 <title>The Game!</title>
+</head>
 
 
-
+<body>
 <%//instantiating the map 
 ArrayList<Player> players = (ArrayList<Player>) request.getAttribute("players");
 Territory[][] map = (Territory[][]) request.getAttribute("map"); 
@@ -27,6 +29,7 @@ currPlayer.resetArmy();%>
 <% for (Player player: players) { %>
 <span style ="color:<%= player.getColor() %>"> <%= player %></span><br>
 <% } %>
+
 <br>
 Let's make a map! <br><br>
 The "O"s represent each player's home base!<br>
@@ -46,23 +49,24 @@ It's <span style="color<%=currPlayer.getColor()%>"><%=currPlayer.getName()%>'s t
 <input type="submit" value="Spawn another Unit!" />
 </form>
 
+<div class=bg>
 
-[~]<% for(int a = 0; a < 15;a++){ %>[<%=a%>]<%}%>
-<br>
 <%//printing the map 
+
   for(int a = 0; a <9; a++)
   { %>
-	[<%=a%>]<%
+	<%
 	for(int b = 0; b < 15; b++)	
 	{
  	if(map[a][b].hasResources()) { %>[x]<% }   
-	if(map[a][b].isHomeBase()) {%>[<span style="color:<%=map[a][b].getPlayer().getColor()%>">O</span>]<%} 
- 	if(map[a][b].isOccupied()) { %>[<span style="color:<%=map[a][b].getPlayer().getColor()%>"><%=map[a][b].getOccupants().size()%></span>]<%} 
-	if (!map[a][b].hasResources() && !map[a][b].isHomeBase() && !map[a][b].isOccupied()) {%>[ ]<%}  
+	else if(map[a][b].isHomeBase()) {%></span><img src="<%=map[a][b].getPlayer().getHomeBasePath()%>"><%} 
+ 	else if(map[a][b].isOccupied()) { %><img src="<%=map[a][b].getPlayer().getUnitImgPath()%>"><%} 
+	else if (!map[a][b].hasResources() && !map[a][b].isHomeBase() && !map[a][b].isOccupied()) {%><img src="transparent.png"><%}  
+	
 	 }%>
 <br>	
 <%}%>
+</div>
 </font> 
-
-</head>
+</body>
 </html>
