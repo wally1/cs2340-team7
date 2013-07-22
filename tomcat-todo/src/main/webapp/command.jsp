@@ -19,7 +19,7 @@ int gameID = (Integer)request.getAttribute("gameID");
 int turnCount = (Integer)request.getAttribute("turnCount");
 int playerTurn = (Integer)request.getAttribute("playerTurn");
 int playerActionsSoFar = (Integer)request.getAttribute("playerActionsSoFar");
-int imageTopPX = 625;
+int imageTopPX = 700;
 int imageLeftPX = 0;%>
 
 GameID: <%=gameID%><br>
