@@ -4,9 +4,7 @@ import edu.gatech.cs2340.todo.model.Player;
 import edu.gatech.cs2340.todo.model.Resource;
 import java.util.*;
 
-public class Territory implements Comparable<Territory>
-{
-	
+public class Territory implements Comparable<Territory>{
 	String name; 
 	int[] coordinates;
 	ArrayList<Resource> resources; //Resources this particular territory possesses, ie additional money to purchase troops, upgrades for troops, map information
@@ -17,9 +15,7 @@ public class Territory implements Comparable<Territory>
 	boolean homeBase;
 	int health; //only for homebases
 
-	public Territory(String name, int[] coords)
-	{
-	
+	public Territory(String name, int[] coords){
 		this.name=name;
 		coordinates = coords;
 		resources = new ArrayList<Resource>();
@@ -30,8 +26,8 @@ public class Territory implements Comparable<Territory>
 		homeBase = false;
 		health = 0;
 	}
-	public int compareTo(Territory other)
-	{
+	
+	public int compareTo(Territory other){
 		if(coordinates[0] < other.getCoords()[0])
 			return -1;
 		else if(coordinates[0] > other.getCoords()[0])
@@ -41,14 +37,14 @@ public class Territory implements Comparable<Territory>
 			return 1;
 		else 
 			return -1;
-
 	}
-	public boolean equals(Territory other)
-	{
+	
+	public boolean equals(Territory other){
 		if (Arrays.equals(coordinates,other.getCoords()))
 			return true;
 		return false;
 	}
+	
 	//if the territory is occupied by an asteroid
 	public void makeNotOccupiable(){
 	    occupiable = false;
@@ -70,18 +66,18 @@ public class Territory implements Comparable<Territory>
 		if(health <= 0)
 			occupiedByPlayer.loses();
 	}
-	public boolean isHomeBase()
-	{
+	
+	public boolean isHomeBase(){
 		return homeBase;
 	}
-	public void addResource(Resource treasure)
-	{
+	
+	public void addResource(Resource treasure){
 		resources.add(treasure);
-		if (treasure.getName().equals("Asteroid"))
-			occupiable = false;
+			if (treasure.getName().equals("Asteroid"))
+				occupiable = false;
 	}
-	public boolean hasResources()
-	{
+	
+	public boolean hasResources(){
 		if (resources.size()>0)
 			return true;
 		else 
@@ -89,17 +85,15 @@ public class Territory implements Comparable<Territory>
 	}
 	
 	//player parameter slightly redundant
-	public void addUnit(Unit conquerer)
-	{
-		if(occupiable)// not an asteroid
-		{
+	public void addUnit(Unit conquerer){
+	
+		if(occupiable){// not an asteroid
 			//if territory is already occupied by another player, then nothing happens
-			if(isOccupied && !occupiedByPlayer.equals(conquerer.getOwner())) 
-			{
+			
+			if(isOccupied && !occupiedByPlayer.equals(conquerer.getOwner())){
 				System.out.println("You can't move there, something's in the way!");
 			}
-			else
-			{
+			else{
 				isOccupied = true;
 				occupiedByUnit.put(conquerer.getID(),conquerer);
 				occupiedByPlayer = conquerer.getOwner();
@@ -107,28 +101,29 @@ public class Territory implements Comparable<Territory>
 		}
 		else
 			System.out.println("There's something in the way!");
-		
-		
 	}
+	
 	public String getName(){
 		return name;
 	}
+	
 	public int[] getCoords(){
 		return coordinates;
 	}
-	public Boolean isOccupied()
-	{
+	
+	public Boolean isOccupied(){
 		return isOccupied;
 	}
-	public TreeMap<Integer, Unit> getOccupants()
-	{
+	
+	public TreeMap<Integer, Unit> getOccupants(){
 		return occupiedByUnit;
 	}
-	public Player getPlayer()
-	{
+	
+	public Player getPlayer(){
 		return occupiedByPlayer;
 	}
 	
+
 
 	public void update(Unit unit)
 	{
@@ -158,11 +153,6 @@ public class Territory implements Comparable<Territory>
 	{
 		return name;
 	}
-	
-	
-	
-	
-	
-	
-	
+
+
 }

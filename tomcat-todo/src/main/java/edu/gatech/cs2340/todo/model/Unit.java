@@ -1,18 +1,13 @@
 package edu.gatech.cs2340.todo.model;
-
-
-
 import java.util.*;
 
-public class Unit
-{
+public class Unit{
 	String name;
 	int id; 
 	int health;
 	int maxHealth;
-	int strength; //amount of damage Unit can deal 
-	int defense; //lowers amount of damage Unit takes 
-//	ArrayList<Resource> inventory; //inventory of unit ie speed boost, attack boost, etc.
+	int strength;  
+	int defense; 
 	Player owner; 
 	Territory previouslyOccupied;
 	Territory occupying;
@@ -20,86 +15,78 @@ public class Unit
 	boolean attacked;
 	boolean moved;
 	
-	public  Unit(String name, int health, int strength, int defense)
-	{
+	public  Unit(String name, int health, int strength, int defense){
 		this.name = name;
 		id = 0;
 		this.health = maxHealth = health;
 		this.strength=strength;
 		this.defense = defense;
-	//	inventory = new ArrayList<Resource>();
 		owner = null;
 		previouslyOccupied = null;
 		occupying = null;
 		attacked = false;
-		moved = false;
-		
-		
+		moved = false;		
 	}
-	public  Unit(String name, int health, int strength, int defense, Player owner)
-	{
+	
+	public  Unit(String name, int health, int strength, int defense, Player owner){
 		this.name = name;
 		id = 0;
 		this.health = maxHealth = health;
 		this.strength=strength;
 		this.defense = defense;
-	//	inventory = new ArrayList<Resource>();
 		this.owner = owner;
 		previouslyOccupied = null;
 		occupying = null;
 		attacked = false;
-		moved = false;
-		
+		moved = false;		
 	}
-	public String getName()
-	{
+	
+	public String getName(){
 		return name;
 	}
-	public void takeDamage(int a)
-	{
+	
+	public void takeDamage(int a){
 		health-=a;
 	}
-	public int getHealth()
-	{
+	
+	public int getHealth(){
 		return health;
 	}
-	public int getMaxHealth()
-	{
+	
+	public int getMaxHealth(){
 		return maxHealth;
 	}
-	public int getStrength()
-	{
+	
+	public int getStrength(){
 		return strength;
 	}
-	public int getDefense()
-	{
+	
+	public int getDefense(){
 		return defense;
 	}
-	public void setID(int id)
-	{
+	
+	public void setID(int id){
 		this.id = id;
 	}
-	public int getID()
-	{
+	
+	public int getID(){
 		return id;
 	}
-	public void setOwner(Player player)
-	{
+	
+	public void setOwner(Player player){
 		owner = player;
 	}
-	public Player getOwner()
-	{
+	
+	public Player getOwner(){
 		return owner;
 	}
-	//setTerritory and move methods separated to smooth over Player.update()
-	public void setTerritory(Territory location)
-	{
+	
+	public void setTerritory(Territory location){
 		previouslyOccupied = occupying;
 		occupying = location;
-
 	}
-	public void move(Territory location)
-	{
+	
+	public void move(Territory location){
 		setTerritory(location);
 		owner.updateTerritories(this);
 		moved = true;
@@ -107,18 +94,18 @@ public class Unit
 		occupying.addUnit(this);
 	}
 
-	public Territory getTerritory()
-	{
+	public Territory getTerritory(){
 		return occupying;
 	}
-	public Territory getPreviouslyOccupied()
-	{
+	
+	public Territory getPreviouslyOccupied(){
 		return previouslyOccupied;
 	}
-	public void setAttacked(boolean attack)
-	{
+	
+	public void setAttacked(boolean attack){
 		attacked = attack;
 	}
+	
 	public boolean getAttacked(){
 		return attacked;
 	}
@@ -126,17 +113,15 @@ public class Unit
 	public boolean getMoved(){
 		return moved;
 	}	
-	public void resetForTurn()
-	{
+	
+	public void resetForTurn(){
 		attacked = moved = false;
 	}
-	public String toString()
-	{
+	
+	public String toString(){
 		return name+"-"+getID()+" has "+health+"/"+maxHealth+" health, is at "+occupying+
 				"     has moved - "+moved+"     has attacked - "+attacked;
-
 	}
-
 }
 	
 	
