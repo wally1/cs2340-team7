@@ -2,10 +2,11 @@
 <head>
 <title>And The Winner Is...</title>
 
-<% String winner = (String) request.getAttribute("winner"); %>
+<% String winner = (String) request.getAttribute("winner");
+String country = (String) request.getAttribute("country"); %>
 
 <font size = "18">
-Congratulations <%=winner%>! You are the Champion of the Stars!
+Congratulations <%=winner%> of <%=country %>! You are the Champion of the Stars!
 
 </font>
 

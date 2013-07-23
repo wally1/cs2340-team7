@@ -28,7 +28,7 @@ public class Player implements Comparable<Player>{
     	else if (country.equals("Alpha-Centauri")) { return "green";}
     	else if (country.equals("Char")) { return "red";} 
     	else if (country.equals("Midichloria")) { return "blue";}
-    	else if (country.equals("Borg")) { return "gray";} 
+    	else if (country.equals("Borg")) { return "yellow";} 
     	else if (country.equals("HAL Space Station")) { return "orange";}
     	else
     		return "pink";
@@ -138,21 +138,21 @@ public class Player implements Comparable<Player>{
     		occupiedTerritories.remove(a);
     }
 	 
-/*    public void removeDeadUnits(){
+    public void removeDeadUnits(){
     	ArrayList<String> terrToBeRemoved = new ArrayList<String>();
     	ArrayList<Integer> unitToBeRemoved = new ArrayList<Integer>();
     	for(int id:army.keySet()){
     		if(army.get(id).getHealth() <= 0){
     			int currentUnitAmount = occupiedTerritories.get(army.get(id).getTerritory().getName());
     	    	occupiedTerritories.put(army.get(id).getTerritory().getName(),currentUnitAmount-1);
-    	    	toBeRemoved.add(id);
+    	    	unitToBeRemoved.add(id);
     	    	System.out.println("Removed!");
     		}
     	}
-    	for(int id: toBeRemoved){
+    	for(int id: unitToBeRemoved){
     		army.remove(id);
     	}
-    }*/
+    }
   
     //updateTerritories for MOVING, not as a result of being destroyed
     //this is because destroyed units do not move when they are destroyed, and updateTerritories tries

@@ -9,6 +9,7 @@ public class Territory implements Comparable<Territory>{
 	int[] coordinates;
 	boolean isOccupied; 
 	TreeMap<Integer,Unit> occupiedByUnit; //key is unit id, value is the unit
+	ArrayList<Resource> resources;
 	Player occupiedByPlayer; 
 	boolean occupiable;
 	boolean homeBase;
@@ -20,6 +21,7 @@ public class Territory implements Comparable<Territory>{
 		coordinates = coords;
 		isOccupied = false;
 		occupiedByUnit = new TreeMap<Integer,Unit>();
+		resources = new ArrayList<Resource>();
 		occupiedByPlayer = null;
 		occupiable = true;
 		homeBase = false;
@@ -132,21 +134,16 @@ public class Territory implements Comparable<Territory>{
 	}
 	 public void removeDeadUnits()
 	    {
-	 //   	ArrayList<Integer> toBeRemoved = new ArrayList<Integer>();
-/*	    	for(int id: army.keySet())
-	    	{
-	    		if(army.get(id).getHealth() <= 0)
-	    		{
-	    			int currentUnitAmount = occupiedTerritories.get(army.get(id).getTerritory().getName());
-	    	    	occupiedTerritories.put(army.get(id).getTerritory().getName(),currentUnitAmount-1);
-	    	    	toBeRemoved.add(id);
-	    	    	System.out.println("Removed!");
-	    		}
-	    	}
-	    	for(int id: toBeRemoved)
-	    	{
-	    		army.remove(id);
-	    	}*/
+			ArrayList<Integer> toBeRemoved = new ArrayList<Integer>();
+		     for(int id : occupiedByUnit.keySet())		     {
+		    	 Unit unit = occupiedByUnit.get(id);
+		    	 if(unit.getHealth()<0)
+		    		 toBeRemoved.add(id);	
+		     }
+		     for(int id:toBeRemoved)
+		    	 occupiedByUnit.remove(id);
+		     if(occupiedByUnit.size() == 0)
+		    	 isOccupied = false;
 	    }
 	public String toString()
 	{

@@ -22,7 +22,13 @@ public class RiskGame {
  public RiskGame() {
      this.gameID = gameIDs;
      gameIDs += 1;
-
+     this.state = ADD_PLAYERS;
+     this.turnCount = 0;
+     this.players = new ArrayList<Player>();
+     this.playerTurn = 0;
+     this.playerActionsSoFar = 0;
+     map = new Territory[0][0];
+ }
 public RiskGame(int gameID){
      this.gameID = gameID;
      this.state = ADD_PLAYERS;
@@ -82,6 +88,8 @@ public void nextTurn()
 		playerTurn = 0;
     playerActionsSoFar = 0;
     state = SELECT_LOCATION;
+    if(getCurrentPlayer().hasLost())
+    	nextTurn();
 }
 
 public boolean spawnUpdate(int[] co) {
@@ -144,7 +152,10 @@ public boolean attackUpdate(ArrayList<Integer> selectedUnitIDs, int[] moveCo) {
         }
         
         if (attackSucceed) {
-            fight(selectedUnits, victims);
+        	if(location.isHomeBase())
+        		bombard(selectedUnits,location);
+        	else
+        		fight(selectedUnits, victims);
             success = true;
         } else {
             System.out.println("Some of the selected units can't attack!");
@@ -277,18 +288,20 @@ public void bombard(ArrayList<Unit> attackers, Territory homebase){
 			for(Territory[] a: map)
 				for(Territory b: a)
 					b.removeDeadUnits();
+			for(Player player:players)
+				player.removeDeadUnits();
+
 			System.out.println(victim.getName()+" has lost!!!");
-			for(int a = 0; a<players.size();a++){
+	/*		for(int a = 0; a<players.size();a++){
 				if(players.get(a).getName().equals(victim.getName())){
 					players.remove(a);
 					break;
 				}
-			}
+			}*/
 			//since we're removing a player directly from the player ArrayList upon death, need to make sure we don't
 			//skip over the next player when the turn increments
-			for(int a = 0; a<players.size()-1;a++)
-				nextTurn();
-			System.out.println(victim.getName()+" has lost!!!");
+/*			for(int a = 0; a<players.size()-1;a++)
+				nextTurn();*/
 		}	
 		if(players.size() == 1)
 			state = ADD_PLAYERS;
@@ -333,10 +346,6 @@ public void fight(ArrayList<Unit> attackers, ArrayList<Unit> defenders){
 			System.out.println(victim.getName() + "-"+victim.getID()+" was attacked for "+damage+" down to "+victim.getHealth()+"/"+victim.getMaxHealth()+"!");
 			}
 		}
-
-		for(Unit a: defenders)
-			a.update();
-
 		for(Player player:players)
 			player.removeDeadUnits();
 		for(Territory[] a: map)
@@ -397,20 +406,21 @@ public Territory[][] initializeBoard(){
 		}
 		//upper left is AC
 		if(countries.contains("Alpha-Centauri")){
+		 Player aPlayer = players.get(countries.indexOf("Alpha-Centauri"));
  		 map[0][1].makeHomeBase(players.get(countries.indexOf("Alpha-Centauri"))); 
  		 int[] coords ={0,0,1,0,1,1,1,2,0,2};
- 		 id = spawn(map, ACUnit,armysize,coords,id); 
-	}
+ 		 id = spawn(map, "Alpha-Centaurian Frigate",5,4,1,armysize,aPlayer,coords); 
+		}
  		 
  		 //upper middle is Polaris
- 		 if(countries.contains("Polaris")){
+ 		if(countries.contains("Polaris")){
             Player aPlayer = players.get(countries.indexOf("Polaris"));
  			map[0][7].makeHomeBase(aPlayer); 
  			int[] coords = {0,6,1,6,1,7,1,8,0,8};
  		 	id=spawn(map, "Polarian Manta",4,5,2,armysize, aPlayer, coords);  
- 		 }
+ 	    }
  		 //upper right is Midichloria
- 		 if(countries.contains("Midichloria")){
+ 		if(countries.contains("Midichloria")){
             Player aPlayer = players.get(countries.indexOf("Midichloria"));
  			map[0][13].makeHomeBase(aPlayer);
  			int[] coords = {0,12,1,12,1,13,1,14,0,14};
@@ -484,6 +494,16 @@ protected boolean checkAdjacent(int[] homeCo, int[] adjacentCo){
 		int adjY = adjacentCo[0];
 		
 		return Math.abs(homeX-adjX) <= 1 && Math.abs(homeY-adjY) <=1;
+}
+public boolean checkOver()
+{
+	int count = 0;
+	for(Player player: players)
+	{
+		if(!player.hasLost())
+			count++;
+	}
+	return count==1;
 }
  
   

@@ -34,14 +34,11 @@ GameID: <%=gameID%><br>
 <input type ="Submit" value = "Refresh" ><br>
 </form>
 
-<% for (Player player: players) { %>
+<% for (Player player: players) { 
+if(!player.hasLost()) {%>
 <span style ="color:<%= player.getColor() %>"> <%= player %></span><br>
-<% } %>
+<% }} %>
 <br>
-Let's make a map! <br><br>
-The "O"s represent each player's home base!<br>
-The "X"s represent impassable asteroids!<br>
-The "#"s in each territory represent the number of Units in each territory!<br>
 <br>
 <br>
 
@@ -62,15 +59,15 @@ It's <span style="color<%=currPlayer.getColor()%>"><%=currPlayer.getName()%>'s t
 
 
 
-<img style="position:absolute; top:<%=imageTopPX%>px; left:<%=imageLeftPX%>px; width:1125px; height:675px" src="images\space_map_grid_only.png">
+<img style="position:absolute; top:<%=imageTopPX%>px; left:<%=imageLeftPX%>px; width:1125px; height:675px" src="images/space_map_grid_only.png">
 <%//printing the map 
   for(int a = 0; a <9; a++)
   { %><%
 	for(int b = 0; b < 15; b++)	
 	{
- 	if(map[a][b].hasResources()) { %><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images\<%=map[a][b].getPlayer().getColor()%>_starship.png"><% }   
-	if(map[a][b].isHomeBase()) {%><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images\<%=map[a][b].getPlayer().getColor()%>_station.png"><%} 
- 	if(map[a][b].isOccupied()) { %><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images\<%=map[a][b].getPlayer().getColor()%>_starship.png"><%} 
+ 	if(map[a][b].hasResources()) { %><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images/<%=map[a][b].getPlayer().getColor()%>_starship.png"><% }   
+	if(map[a][b].isHomeBase()) {%><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images/<%=map[a][b].getPlayer().getColor()%>_station.png"><%} 
+ 	if(map[a][b].isOccupied()) { %><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images/<%=map[a][b].getPlayer().getColor()%>_starship.png"><%} 
 	if (!map[a][b].hasResources() && !map[a][b].isHomeBase() && !map[a][b].isOccupied()) {%><%}  
 	 }%>	
 <%}%>

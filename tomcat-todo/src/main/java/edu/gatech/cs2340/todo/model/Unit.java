@@ -5,7 +5,6 @@ import java.util.*;
     
 public class Unit{
 	
-}
 	private static int unitIDs = 0;
 	String name;
 	int id; 
@@ -60,25 +59,13 @@ public class Unit{
 		owner.update(this);
 		occupying.update(this);
 	}
-    
-	public int getID()	{
-		return id;
-	}
-    
+
 	public void setOwner(Player player)	{
 		owner = player;
 	}
     
 	public Player getOwner()	{
 		return owner;
-	}
-	
-	public String getName(){
-		return name;
-	}
-	
-	public void takeDamage(int a){
-		health-=a;
 	}
 	
 	public int getHealth(){

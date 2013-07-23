@@ -20,7 +20,7 @@ int turnCount = (Integer)request.getAttribute("turnCount");
 int playerTurn = (Integer)request.getAttribute("playerTurn");
 int playerActionsSoFar = (Integer)request.getAttribute("playerActionsSoFar");
 int imageTopPX = 700;
-int imageLeftPX = 0;%>
+int imageLeftPX = 700;%>
 
 GameID: <%=gameID%><br>
 <form action=/todo/update method="POST">
@@ -107,17 +107,17 @@ Choose the Territory you'd like to attack!
 <font face="courier">
 
 
-<img style="position:absolute; top:<%=imageTopPX%>px; left:<%=imageLeftPX%>px; width:1125px; height:675px" src="images\space_map_grid_only.png">
+<img style="position:absolute; top:<%=imageTopPX%>px; left:<%=imageLeftPX%>px; width:1125px; height:675px" src="images/space_map_grid_only.png">
 <%//printing the map 
   for(int a = 0; a <9; a++)
   { %>
 	[<%=a%>]<%
 	for(int b = 0; b < 15; b++)
 	{
- 	if(map[a][b].hasResources()) { %><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images\<%=map[a][b].getPlayer().getColor()%>_starship.png"><% }   
-	if(map[a][b].isHomeBase()) {%><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images\<%=map[a][b].getPlayer().getColor()%>_station.png"><%} 
- 	if(map[a][b].isOccupied()) { %><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images\<%=map[a][b].getPlayer().getColor()%>_starship.png"><%} 
-	if(a==selectedA && b==selectedB){%><img style="position:absolute; top:<%=imageTopPX+10+a*75%>px; left:<%=imageLeftPX+10+b*75%>px; width:20px; height:20px" src="images\pointer.png"><%}
+ 	if(map[a][b].hasResources()) { %><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images/<%=map[a][b].getPlayer().getColor()%>_starship.png"><% }   
+	if(map[a][b].isHomeBase()) {%><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images/<%=map[a][b].getPlayer().getColor()%>_station.png"><%} 
+ 	if(map[a][b].isOccupied()) { %><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images/<%=map[a][b].getPlayer().getColor()%>_starship.png"><%} 
+	if(a==selectedA && b==selectedB){%><img style="position:absolute; top:<%=imageTopPX+10+a*75%>px; left:<%=imageLeftPX+10+b*75%>px; width:20px; height:20px" src="images/pointer.png"><%}
     if (!map[a][b].hasResources() && !map[a][b].isHomeBase() && !map[a][b].isOccupied()) {%><%}  
 	 }%>	
 <%}%>
