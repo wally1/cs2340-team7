@@ -1,7 +1,6 @@
 package edu.gatech.cs2340.todo.model;
 import edu.gatech.cs2340.todo.model.*;
 import java.util.*;
-import java.util.*;
 
 public class RiskGame {
 
@@ -99,7 +98,8 @@ public boolean spawnUpdate(int[] co) {
         // spawn for this
         Player player = getCurrentPlayer();
         if (check(co, player)) {
-            spawn(getMap(), "Space Frigate", 40, 6, 0, 1, player, co);
+        	Unit a = player.getUniqueUnit();
+            spawn(getMap(), a.getName(), a.getHealth(), a.getStrength(), a.getDefense(), 1, player, co);
             state = COMMAND;
             success = true;
             playerActionsSoFar += 1;
@@ -109,23 +109,29 @@ public boolean spawnUpdate(int[] co) {
 }
 
 public boolean moveUpdate(ArrayList<Integer> selectedUnitIDs, int[] moveCo) {
-    boolean success = false;
+    boolean success = true;
     ArrayList<Unit> selectedUnits = new ArrayList<Unit>();
     for (int i = 0; i < selectedUnitIDs.size(); i++)
         selectedUnits.add(getCurrentPlayer().getArmy().get(selectedUnitIDs.get(i)));
-    int[] startCo = selectedUnits.get(0).getTerritory().getCoords();
+    Territory start = selectedUnits.get(0).getTerritory();
+    int[] startCo = start.getCoords();
     Territory location = map[moveCo[0]][moveCo[1]];
     
-    // try to move selected units - moves all units that are able to
-    if (checkAdjacent(startCo, moveCo)) {
+    // try to move iff all units can move there.
+    if (checkAdjacent(startCo, moveCo) && location.isOccupiable(start.getPlayer())) {
         for(Unit a: selectedUnits) {
-            if (!a.getMoved()) {
-                a.move(location);
+            if (a.getMoved()) {
+                success = false;
             }
         }
-        success = true;
         playerActionsSoFar += 1;
     }
+    else
+    	success = false;
+    
+    if(success)
+    	for(Unit a: selectedUnits)
+    		a.move(location);
     
     return success;
 }
@@ -141,7 +147,7 @@ public boolean attackUpdate(ArrayList<Integer> selectedUnitIDs, int[] moveCo) {
 	for(int ids: location.getOccupants().keySet())
         victims.add(location.getOccupants().get(ids));
     
-    // try the attack
+    // try the attack - attack succeeds iff all units can attack
     boolean attackSucceed = true;
     if (checkAdjacent(startCo, moveCo)) {
         System.out.println("We are attacking!");
@@ -195,6 +201,16 @@ public String removePlayer(int id){
 		 players.remove(id);
 		 result = "Removed!";
          playerActionsSoFar += 1;
+	 }
+	 return result;	 
+}
+public String updatePlayer(int id, String name, String country){
+	 String result = "";
+	 if(state == ADD_PLAYERS){
+		 System.out.println("We're updating a player!");
+		 players.set(id, new Player(name, country));
+		 result = "Updated!";
+        playerActionsSoFar += 1;
 	 }
 	 return result;	 
 }
@@ -354,6 +370,8 @@ public void fight(ArrayList<Unit> attackers, ArrayList<Unit> defenders){
 }
 
 public Territory[][] initializeBoard(){
+	ArrayList<String> countries = new ArrayList<String>();
+	int armysize = 10-players.size();
  	map = new Territory[9][15];
  	for(int a = 0; a <9; a++){
  		for(int b = 0; b < 15; b++){
@@ -363,53 +381,43 @@ public Territory[][] initializeBoard(){
  			map[a][b] = new Territory("Territory ["+a+","+b+"]",coord); 				
  		} 
  	}
- 
-  	Unit ACUnit = new Unit("Alpha-Centaurian Space Frigate",5,3,1,null);
- 	Unit PolarisUnit = new Unit("Polarian Manta",4,5,2,null);
- 	Unit CharUnit = new Unit("Char Swarmling",3,2,0,null);
- 	Unit BorgUnit = new Unit("Borg Assimilator",8,2,2,null);
- 	Unit HALUnit = new Unit("HSS Probe",5,3,1,null);
- 	Unit MidiUnit = new Unit("Midichlorian Force",6,4,1,null);
- 	int armysize = (10-players.size()); 
- 	ArrayList<String> countries = new ArrayList<String>(); 
-
- 	for (Player player: players) { 
- 		 countries.add(player.getCountry());
- 		 if(player.getCountry().equals("Alpha-Centauri")){ACUnit.setOwner(player);}
- 		 else if(player.getCountry().equals("Polaris")){PolarisUnit.setOwner(player);}
- 		 else if(player.getCountry().equals("Char")){CharUnit.setOwner(player);}
- 		 else if(player.getCountry().equals("Borg")){BorgUnit.setOwner(player);}
- 		 else if(player.getCountry().equals("HAL Space Station")){HALUnit.setOwner(player);}
- 		 else if(player.getCountry().equals("Midichloria")){MidiUnit.setOwner(player);}
+ 	Random rand = new Random();
+ 	for(int a = 2; a < 6; a++){
+ 		for(int b = 0; b < 15;b++) 		{
+ 			int chanceToSpawnAsteroid = rand.nextInt(100)+1;
+ 			if(chanceToSpawnAsteroid > 70)
+ 				map[a][b].makeAsteroid();
+ 		}
  	}
  	
 	for (Player player: players){ 
 		countries.add(player.getCountry()); 
 		if(player.getCountry().equals("Alpha-Centauri")){
-			ACUnit.setOwner(player);
+			player.setUniqueUnit("Alpha-Centaurian Space Frigate", 7,3,1);
 		}
  		 	else if(player.getCountry().equals("Polaris")){
-				PolarisUnit.setOwner(player);
+				player.setUniqueUnit("Polarian Manta",7,5,2);
 			}
  		 	else if(player.getCountry().equals("Char")){
-				CharUnit.setOwner(player);
+ 		 		player.setUniqueUnit("Char Swarmling",4,3,0);
 			}
  		 	else if(player.getCountry().equals("Borg")){
-			BorgUnit.setOwner(player);
+ 		 		player.setUniqueUnit("Borg Assimilator",10,3,1);
 			}
  		 	else if(player.getCountry().equals("HAL Space Station")){
-			HALUnit.setOwner(player);
+ 		 		player.setUniqueUnit("HSS Probe",4,4,1);
 			}
  		 	else if(player.getCountry().equals("Midichloria")){
-			MidiUnit.setOwner(player);
+ 		 		player.setUniqueUnit("Midichlorian Force",6,4,0);
 			}
 		}
+	
 		//upper left is AC
 		if(countries.contains("Alpha-Centauri")){
 		 Player aPlayer = players.get(countries.indexOf("Alpha-Centauri"));
  		 map[0][1].makeHomeBase(players.get(countries.indexOf("Alpha-Centauri"))); 
  		 int[] coords ={0,0,1,0,1,1,1,2,0,2};
- 		 id = spawn(map, "Alpha-Centaurian Frigate",5,4,1,armysize,aPlayer,coords); 
+ 		 id = spawn(map, "Alpha-Centaurian Space Frigate",7,3,1,armysize,aPlayer,coords); 
 		}
  		 
  		 //upper middle is Polaris
@@ -417,14 +425,14 @@ public Territory[][] initializeBoard(){
             Player aPlayer = players.get(countries.indexOf("Polaris"));
  			map[0][7].makeHomeBase(aPlayer); 
  			int[] coords = {0,6,1,6,1,7,1,8,0,8};
- 		 	id=spawn(map, "Polarian Manta",4,5,2,armysize, aPlayer, coords);  
+ 		 	id=spawn(map, "Polarian Manta",7,5,2,armysize, aPlayer, coords);  
  	    }
  		 //upper right is Midichloria
  		if(countries.contains("Midichloria")){
             Player aPlayer = players.get(countries.indexOf("Midichloria"));
  			map[0][13].makeHomeBase(aPlayer);
  			int[] coords = {0,12,1,12,1,13,1,14,0,14};
- 			id=spawn(map, "Midichlorian Force",6,4,1,armysize, aPlayer, coords); 
+ 			id=spawn(map, "Midichlorian Force",6,4,0,armysize, aPlayer, coords); 
  		}
  		 
  		 //bottom left Char
@@ -432,7 +440,7 @@ public Territory[][] initializeBoard(){
             Player aPlayer = players.get(countries.indexOf("Char"));
  			map[8][1].makeHomeBase(aPlayer);
  			int[] coords = {8,0,7,0,7,1,7,2,8,2};
- 			id=spawn(map, "Char Swarmling",3,2,0,armysize, aPlayer,coords); 
+ 			id=spawn(map, "Char Swarmling",4,3,0,armysize, aPlayer,coords); 
  		 }
 
  		 //bottom middle is HAL Space Station
@@ -440,7 +448,7 @@ public Territory[][] initializeBoard(){
              Player aPlayer = players.get(countries.indexOf("HAL Space Station"));
  			 map[8][7].makeHomeBase(aPlayer); 
  			 int[] coords = {8,6,7,6,7,7,7,8,8,8};
- 			id= spawn(map, "HSS Probe",5,3,1 ,armysize, aPlayer, coords); 
+ 			id= spawn(map, "HSS Probe",4,4,1 ,armysize, aPlayer, coords); 
  		}
  		 
  		 //bottom right is Borg
@@ -448,7 +456,7 @@ public Territory[][] initializeBoard(){
              Player aPlayer = players.get(countries.indexOf("Borg"));
  			 map[8][13].makeHomeBase(aPlayer); 
  			 int[] coords = {8,14,7,14,7,13,7,12,8,12};
- 			id= spawn(map, "Borg Assimilator",8,2,2, armysize, aPlayer, coords); 
+ 			id= spawn(map, "Borg Assimilator",10,3,1, armysize, aPlayer, coords); 
  		}
 
  	return map;

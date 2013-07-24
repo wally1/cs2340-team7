@@ -8,7 +8,7 @@
 <% //some initializations
 //nearly all of this code needs to merged into the RiskGame class.
 %>
-
+<link rel="stylesheet" type="text/css" href="stylesheet.css">
 <%//instantiating the map 
 ArrayList<Player> players = (ArrayList<Player>) request.getAttribute("players");
 Territory[][] map = (Territory[][]) request.getAttribute("map");
@@ -20,7 +20,7 @@ int gameID = (Integer)request.getAttribute("gameID");
 int turnCount = (Integer)request.getAttribute("turnCount");
 int playerTurn = (Integer)request.getAttribute("playerTurn");
 //int playerActionsSoFar = (Integer)request.getAttribute("playerActionsSoFar"); 
-int imageTopPX = 400;
+int imageTopPX = 300;
 int imageLeftPX = 0;%>
 
 
@@ -39,12 +39,10 @@ if(!player.hasLost()) {%>
 <span style ="color:<%= player.getColor() %>"> <%= player %></span><br>
 <% }} %>
 <br>
-<br>
-<br>
 
 <font face="courier">
-
-It's <span style="color<%=currPlayer.getColor()%>"><%=currPlayer.getName()%>'s turn to spawn a new Unit!</span>
+<span style="color:<%=currPlayer.getColor()%>">
+It's <%=currPlayer.getName()%>'s turn to spawn a new Unit!</span>
 <form action = "update" method="POST">
 <input type="hidden" name = "operation" value = "SPAWN"/>
 <input type="hidden" name="gameID" value="<%=gameID%>">
@@ -53,26 +51,25 @@ It's <span style="color<%=currPlayer.getColor()%>"><%=currPlayer.getName()%>'s t
 <input type="text" name="Coord1"/>
 <input type="text" name="Coord2"/>
 
-<input type="submit" value="Spawn another Unit!" />
+<input type="submit" value="Spawn!" />
 </form>
 </font>
-
 <font face="courier" color="red" size="2px">
-
-<img style="position:absolute; top:<%=imageTopPX%>px; left:<%=imageLeftPX%>px; width:1125px; height:675px" src="images\space_map_grid_only.png">
+<img style="position:absolute; top:<%=imageTopPX%>px; left:<%=imageLeftPX%>px; width:1125px; height:675px" src="images/grid.png">
 <%//printing the map 
   for(int a = 0; a <9; a++)
   { %><%
-	for(int b = 0; b < 15; b++)	
+	for(int b = 0; b < 15; b++)
 	{
- 	if(map[a][b].hasResources()) { %><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images\<%=map[a][b].getPlayer().getColor()%>_starship.png"><% }   
-	if(map[a][b].isHomeBase()) {%><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images\<%=map[a][b].getPlayer().getColor()%>_station.png"><%} 
- 	if(map[a][b].isOccupied()) { %><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images\<%=map[a][b].getPlayer().getColor()%>_starship.png">
+ 	if(map[a][b].isAsteroid()) { %><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images/asteroid.png"><% }   
+    if(map[a][b].isHomeBase()) {%><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images/<%=map[a][b].getPlayer().getColor()%>_station.png"><%} 
+ 	 if(map[a][b].isOccupied()) { %><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images/<%=map[a][b].getPlayer().getColor()%>_starship.png"> 
     <DIV style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px">(<%=a%>,<%=b%>)<br>Units:<%=map[a][b].getOccupants().size()%></DIV>
-    <%} 
-	if (!map[a][b].hasResources() && !map[a][b].isHomeBase() && !map[a][b].isOccupied()) {%><%}  
-	 }%>	
-<%}%>
+	
+<%									}
+ 	}
+  }%>
+
 
 
 </font> 

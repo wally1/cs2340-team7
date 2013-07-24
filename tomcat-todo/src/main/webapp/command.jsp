@@ -6,7 +6,7 @@
 
 <html>
 <head>
-
+<link rel="stylesheet" type="text/css" href="stylesheet.css">
 
 <%ArrayList<Player> players = (ArrayList<Player>) request.getAttribute("players");
 Territory[][] map = (Territory[][]) request.getAttribute("map");
@@ -19,9 +19,9 @@ int gameID = (Integer)request.getAttribute("gameID");
 int turnCount = (Integer)request.getAttribute("turnCount");
 int playerTurn = (Integer)request.getAttribute("playerTurn");
 int playerActionsSoFar = (Integer)request.getAttribute("playerActionsSoFar");
-int imageTopPX = 700;
-int imageLeftPX = 700;%>
-
+int imageTopPX = 0;
+int imageLeftPX = 850;%>
+<span style="color:<%=currPlayer.getColor()%>">
 GameID: <%=gameID%><br>
 <form action=/todo/update method="POST">
 <input type="hidden" name="operation" value="LOAD" />
@@ -42,7 +42,7 @@ Choose one of your Territories to examine!
 	for(String key: terr.keySet()) {%>
 <option value = "<%=key%>"><%=key%></option>
 <%} %>
-<input type="submit" value="Select this Territory"/>
+<input type="submit" value="Select!"/>
 </select>
 </form>
 
@@ -50,6 +50,8 @@ Choose one of your Territories to examine!
 The current selected territory is: <%= selectedTerritory%>
 <br><br>
 Select the units you'd like to attack or move with!
+<frameset>
+<frame>
 <form action = "update" method="POST">
 <%	for(int id: occupants.keySet()) {%>
 	<input type="checkbox" name="unit" value="<%=id%>"><%=occupants.get(id)%><br>
@@ -67,12 +69,13 @@ Choose the Territory you'd like to move to!
 <input type="hidden" name="playerActionsSoFar" value="<%=playerActionsSoFar%>">
 <input type="text" name="MoveCoordY"/>
 <input type="text" name="MoveCoordX"/>
-
+</frame>
 <input type="submit" value="Move!" />
 </form>
-<br>
-<br>
 
+<br>
+<br>
+<frame>
 <form action = "update" method="POST">
 <%	for(int id: occupants.keySet()) {%>
 	<input type="checkbox" name="unit" value="<%=id%>"><%=occupants.get(id)%><br>
@@ -88,7 +91,7 @@ Choose the Territory you'd like to attack!
 <input type="hidden" name="playerActionsSoFar" value="<%=playerActionsSoFar%>">
 <input type="text" name="AttackCoordY"/>
 <input type="text" name="AttackCoordX"/>
-
+</frame>
 <input type="submit" value="Attack!" />
 </form>
 <br>
@@ -100,28 +103,27 @@ Choose the Territory you'd like to attack!
 <input type="hidden" name="playerActionsSoFar" value="<%=playerActionsSoFar%>">
 <input type = "submit" value = "End The Turn"/>
 </form>
-
+</frameset>
 
 <br>
 
 <font face="courier" color="red" size="2px">
+</span>
 
-
-<img style="position:absolute; top:<%=imageTopPX%>px; left:<%=imageLeftPX%>px; width:1125px; height:675px" src="images\space_map_grid_only.png">
+<img style="position:absolute; top:<%=imageTopPX%>px; left:<%=imageLeftPX%>px; width:1125px; height:675px" src="images/grid.png">
 <%//printing the map 
   for(int a = 0; a <9; a++)
   { %><%
 	for(int b = 0; b < 15; b++)
 	{
-    if(a==selectedA && b==selectedB){%><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images\pointer.png"><%}
- 	if(map[a][b].hasResources()) { %><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images\<%=map[a][b].getPlayer().getColor()%>_starship.png"><% }   
-	if(map[a][b].isHomeBase()) {%><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images\<%=map[a][b].getPlayer().getColor()%>_station.png"><%} 
- 	if(map[a][b].isOccupied()) { %><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images\<%=map[a][b].getPlayer().getColor()%>_starship.png">
-    <DIV style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px">(<%=a%>,<%=b%>)<br>Units:<%=map[a][b].getOccupants().size()%></DIV>
-    <%}
-    if (!map[a][b].hasResources() && !map[a][b].isHomeBase() && !map[a][b].isOccupied()) {%><%}
-	 }%>	
-<%}%>
+    if(a==selectedA && b==selectedB){%><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images/pointer.png"><%}
+    if(map[a][b].isAsteroid()) { %><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images/asteroid.png"><% }   
+    if(map[a][b].isHomeBase()) {%><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images/<%=map[a][b].getPlayer().getColor()%>_station.png"><%} 
+    if(map[a][b].isOccupied()) { %><img style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px" src="images/<%=map[a][b].getPlayer().getColor()%>_starship.png"> 
+    <DIV style="position:absolute; top:<%=imageTopPX+a*75%>px; left:<%=imageLeftPX+b*75%>px; width:75px; height:75px">(<%=a%>,<%=b%>)<br>Units:<%=map[a][b].getOccupants().size()%></DIV>	
+<%									}
+    }
+  }%>
 
 </font>
 

@@ -7,13 +7,14 @@
    %>
  
 
-
+<img class="logo" src="logo.png">
 <html>
 <head>
 <title>New Game Setup</title>
-<link rel="stylesheet" type="text/css" href="stylesheets/main.css">
+<link rel="stylesheet" type="text/css" href="stylesheet.css">
 </head>
 <body>
+<span style="color:white">
 <h1>Champion of the Stars</h1>
 GameID: <%=gameID%><br>
 <form action=/todo/update method="POST">
@@ -23,14 +24,17 @@ GameID: <%=gameID%><br>
 </form>
 <table>
 <tr>
+
 <th>Player</th><th>Country</th>
+</span>
 </tr>
 
 The number of players is <%=players.size() %><br>
-
+</span>
 <% for (int id =0;id<players.size();id++) { %>
 <% Player player = players.get(id); %>
 <tr>
+
 <form action="/todo/update/<%= id %>" method="POST">
   <input type="hidden" name="operation" value="PUT"/>
   <input type="hidden" name="gameID" value="<%=gameID%>">
@@ -44,9 +48,10 @@ The number of players is <%=players.size() %><br>
 <option value="Borg">Borg</option>
 <option value="HAL Space Station">HAL Space Station</option></td>
   <td><input type="submit" value="Update"/></td>
-
+  
+<span style ="color:<%= player.getColor() %>">
 Player <%=id+1%>'s name is <%= player.getName() %> <br>
-Player <%=id+1%> is from <span style ="color:<%= player.getColor() %>"> <%= player.getCountry() %></span><br>
+Player <%=id+1%> is from  <%= player.getCountry() %></span><br>
 </form>
 <td valign="middle">
   <form action="/todo/delete/<%= id %>" method="POST">

@@ -7,12 +7,16 @@ import java.util.*;
 public class Territory implements Comparable<Territory>{
 	String name; 
 	int[] coordinates;
-	boolean isOccupied; 
 	TreeMap<Integer,Unit> occupiedByUnit; //key is unit id, value is the unit
 	ArrayList<Resource> resources;
 	Player occupiedByPlayer; 
-	boolean occupiable;
+
 	boolean homeBase;
+	boolean asteroid;
+	
+	//occupiable is for homebase/asteroid, isOccupied is for units
+	boolean occupiable;
+	boolean isOccupied; 
 
 	int health; //only for homebases
 
@@ -24,6 +28,7 @@ public class Territory implements Comparable<Territory>{
 		resources = new ArrayList<Resource>();
 		occupiedByPlayer = null;
 		occupiable = true;
+		asteroid = false;
 		homeBase = false;
 		health = 0;
 	}
@@ -47,13 +52,18 @@ public class Territory implements Comparable<Territory>{
 	}
 	
 	//if the territory is occupied by an asteroid
-	public void makeNotOccupiable(){
+	public void makeAsteroid(){
+	    asteroid = true;
 	    occupiable = false;
 	}  
+	public boolean isAsteroid()
+	{
+		return asteroid;
+	}
 	//the "home base" of the player. New units will spawn adjacent to the home base and if it is "conquered", that player loses.
 	public void makeHomeBase(Player player){
 	    homeBase = true;
-	    makeNotOccupiable();
+	    occupiable = false;
 	    occupiedByPlayer = player;
 	    player.setHomeBase(coordinates[0],coordinates[1]);
 	    health = 150;
@@ -72,12 +82,13 @@ public class Territory implements Comparable<Territory>{
 		return homeBase;
 	}
 	
+	//antiquated as of release - reach goal
 	public void addResource(Resource treasure){
 		resources.add(treasure);
 			if (treasure.getName().equals("Asteroid"))
 				occupiable = false;
 	}
-	
+	//antiquated as of release - reach goal
 	public boolean hasResources(){
 		if (resources.size()>0)
 			return true;
@@ -87,11 +98,11 @@ public class Territory implements Comparable<Territory>{
 	
 	public void addUnit(Unit conquerer){
 	
-		if(occupiable){// not an asteroid
+		if(occupiable){// not an asteroid or homebase
 			//if territory is already occupied by another player, then nothing happens
 			
 			if(isOccupied && !occupiedByPlayer.equals(conquerer.getOwner())){
-				System.out.println("You can't move there, something's in the way!");
+				System.out.println("You can't move there, an enemy unit is in the way!");
 			}
 			else{
 				isOccupied = true;
@@ -110,9 +121,23 @@ public class Territory implements Comparable<Territory>{
 	public int[] getCoords(){
 		return coordinates;
 	}
-	
-	public Boolean isOccupied(){
+
+	public boolean isOccupied(){
 		return isOccupied;
+	}
+	public boolean isOccupiable(Player player)	{
+		
+		if(occupiedByPlayer != null) {
+			if(occupiedByPlayer.equals(player))
+				return true;
+			else
+				return false;
+		}
+		else if(occupiable)
+			return true;
+		else
+			return false;
+		
 	}
 	
 	public TreeMap<Integer, Unit> getOccupants(){

@@ -1,0 +1,30 @@
+.first
+{
+   text-align:center;
+}
+body 
+{
+    background-image: url("space.jpg");
+background-repeat: no-repeat;
+background-color:black;
+}
+
+.logo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+ }
+
+input {
+    background-image: url(button1.png);
+    background-color: transparent; 
+    background-repeat: no-repeat;  
+    background-position: 0px 0px;  
+    border: none;          
+    cursor: pointer;        
+    height: 30px;           
+    width: 90px;
+padding-left: 8px;    
+    vertical-align: middle; 
+color:white;
+}

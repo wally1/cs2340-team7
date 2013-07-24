@@ -53,10 +53,41 @@ public class TodoServlet extends HttpServlet {
             // dispatch
             listDispatcher(request, response, game);
             
-        } 
+        } //update
         else if (operation.equalsIgnoreCase("PUT")) {
             // input, state and dispatch
-            doPut(request, response);
+            RiskGame game = getGameFromID(request);
+            int id = getId(request);
+            int iPlayerActionsSoFar = Integer.parseInt(request.getParameter("playerActionsSoFar"));
+            
+
+            String name = request.getParameter("Name");
+        	String country = request.getParameter("Country");
+
+            
+            // state
+            String success = null;
+            boolean stateCheck = false;
+            if (game != null) {
+                System.out.println("Game State: " +game.getGameState());
+                if (game.getGameState() == RiskGame.ADD_PLAYERS && 
+                            game.getPlayerActionsSoFar() == iPlayerActionsSoFar) {
+                    stateCheck = true;
+                    success = game.updatePlayer(id,name,country);
+                }
+            } else {
+                System.out.println("can't find gameID");
+            }
+            
+            // dispatch
+            if (success != null) {
+                listDispatcher(request, response, game);
+            } else if (stateCheck) {
+                System.out.println(success);
+                listDispatcher(request, response, game);
+            } else {
+                indexDispatcher(request, response);
+            }
         }
         else if (operation.equalsIgnoreCase("DELETE")) {
             // input, state and dispatch
@@ -208,7 +239,7 @@ public class TodoServlet extends HttpServlet {
             // state
             boolean success = false;
             boolean stateCheck = false;
-            if (game!= null ) {
+            if (game!= null) {
                 if (iTurnCount == turnCount && iPlayerTurn == playerTurn && 
                     iPlayerActionsSoFar == playerActionsSoFar) {
                     stateCheck = true;
@@ -410,6 +441,7 @@ public class TodoServlet extends HttpServlet {
 		int id = getId(request);
         
 		request.setAttribute("players", game.getPlayers());
+		request.setAttribute("gameID", game.getPlayers());
 		RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/list.jsp");
 		dispatcher.forward(request,response);
 	}

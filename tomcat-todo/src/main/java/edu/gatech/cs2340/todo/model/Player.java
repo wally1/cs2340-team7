@@ -12,6 +12,8 @@ public class Player implements Comparable<Player>{
     TreeMap<Integer,Unit> army; //Integer key is Unit ID
     boolean hasLost;
     int[] homebase;
+    Unit uniqueUnit;
+    int startingArmySize;
 
     public Player(String title, String task){  
         name = title;
@@ -22,16 +24,23 @@ public class Player implements Comparable<Player>{
         hasLost = false;
         homebase = new int[2];
         color = determineColor(country);
+        uniqueUnit = null;
+        startingArmySize = setStartingArmySize(country);
     }	 
     private String determineColor(String task){
-    	if (country.equals("Polaris")) { return "purple";}
-    	else if (country.equals("Alpha-Centauri")) { return "green";}
-    	else if (country.equals("Char")) { return "red";} 
-    	else if (country.equals("Midichloria")) { return "blue";}
-    	else if (country.equals("Borg")) { return "yellow";} 
-    	else if (country.equals("HAL Space Station")) { return "orange";}
+    	if (task.equals("Polaris")) { return "purple";}
+    	else if (task.equals("Alpha-Centauri")) { return "green";}
+    	else if (task.equals("Char")) { return "red";} 
+    	else if (task.equals("Midichloria")) { return "blue";}
+    	else if (task.equals("Borg")) { return "yellow";} 
+    	else if (task.equals("HAL Space Station")) { return "orange";}
     	else
     		return "pink";
+    }
+    public int setStartingArmySize(String task)
+    {
+     //unique per country, set aside for Milestone
+    	return 0;
     }
     
     public String getColor(){
@@ -78,6 +87,15 @@ public class Player implements Comparable<Player>{
     public void setTurn(int a){
     	turn = a;
     }  
+    public void setUniqueUnit(String name, int health, int strength, int defense)
+    {
+    	uniqueUnit = new Unit(name,health,strength,defense);
+    	uniqueUnit.setOwner(this);
+    }
+    public Unit getUniqueUnit()
+    {
+    	return uniqueUnit;
+    }
     
     public int getTurn(){
     	return turn;
@@ -193,6 +211,7 @@ public class Player implements Comparable<Player>{
     	hasLost = true;
     	for(int id: army.keySet())
     		army.get(id).takeDamage(100000);
+    	occupiedTerritories = new TreeMap<String,Integer>();
     }
     public boolean hasLost(){
     	return hasLost;
