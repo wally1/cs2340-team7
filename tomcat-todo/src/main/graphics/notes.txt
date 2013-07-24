@@ -1,0 +1,16 @@
+specifications
+- square: 75 x 75
+- starship: 46 x 69
+- station: 70 x 58
+- asteroid: 61.95 x 46.29
+
+to do
+- add planets or a big ship in the map's background
+- dynamically add starship count
+- dynamically add starships
+- mouseListener - click available space (units - move and attack)
+ (game needs to recognize where you are on the map and )
+
+notes
+- only things static are space stations and asteroids
+- only 3 stations static since that is the minimum
