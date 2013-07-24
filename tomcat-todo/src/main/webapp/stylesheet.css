@@ -1,20 +1,30 @@
-.space_bg {
+.first
+{
+   text-align:center;
+}
+body 
+{
     background-image: url("space.jpg");
-	background-repeat: no-repeat;
-	margin-right: auto; margin-left: auto;
+background-repeat: no-repeat;
+background-color:black;
 }
 
-.size {
+.logo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+ }
 
-  /* letter-spacing: -1px;  
-   background: rgb(0, 0, 0); 
-   background: rgba(0, 0, 0, 0.7);
-   padding: 10px;
-   position: absolute; */ 
-   width:75px; height:75px;
-
-}
-.space {
-width:75px; height:75px;
-
+input {
+    background-image: url(button1.png);
+    background-color: transparent; 
+    background-repeat: no-repeat;  
+    background-position: 0px 0px;  
+    border: none;          
+    cursor: pointer;        
+    height: 30px;           
+    width: 90px;
+padding-left: 8px;    
+    vertical-align: middle; 
+color:white;
 }
