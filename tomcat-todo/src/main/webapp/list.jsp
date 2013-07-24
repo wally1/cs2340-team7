@@ -89,7 +89,7 @@ if (player==null) {return "pink";}
 else if (player.getCountry().equals("Polaris")) { return "blue";}
 else if (player.getCountry().equals("Alpha-Centauri")) { return "green";}
 else if (player.getCountry().equals("Char")) { return "red";} 
-else if (player.getCountry().equals("Midichloria")) { return "#FFD700";}
+else if (player.getCountry().equals("Midichloria")) { return "#yellow";}
 else if (player.getCountry().equals("Borg")) { return "purple";} 
 else if (player.getCountry().equals("HAL Space Station")) { return "orange";}
  return "";} %>

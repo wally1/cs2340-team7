@@ -59,9 +59,10 @@ It's <span style="color<%=currPlayer.getColor()%>"><%=currPlayer.getName()%>'s t
 	for(int b = 0; b < 15; b++)	
 	{
  	if(map[a][b].hasResources()) { %>[x]<% }   
-	else if(map[a][b].isHomeBase()) {%></span><img src="<%=map[a][b].getPlayer().getHomeBasePath()%>"><%} 
- 	else if(map[a][b].isOccupied()) { %><img src="<%=map[a][b].getPlayer().getUnitImgPath()%>"><%} 
-	else if (!map[a][b].hasResources() && !map[a][b].isHomeBase() && !map[a][b].isOccupied()) {%><img src="transparent.png"><%}  
+	else if(map[a][b].isHomeBase()) {%><img src="<%=map[a][b].getPlayer().getHomeBasePath()%>"><%} 
+ 	else if(map[a][b].isOccupied()) { %><img src="<%=map[a][b].getPlayer().getUnitImgPath()%>"><div class="size"><%=map[a][b].getOccupants().size()%></div><%} 
+	else if (!map[a][b].hasResources() && !map[a][b].isHomeBase() && !map[a][b].isOccupied()) {%><img src="transparent.png">
+	<div class="space"></div><%}  
 	
 	 }%>
 <br>	
